@@ -1,0 +1,76 @@
+{
+    "restaurants": [
+      {
+        "id": 1,
+        "name": "Delicious Bites",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Italian, Chinese",
+        "rating": 4.2,
+        "ratingCount": "500+",
+        "eta": "30-40 min"
+      },
+      {
+        "id": 2,
+        "name": "Spice Paradise",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Indian, Thai",
+        "rating": 4.5,
+        "ratingCount": "1000+",
+        "eta": "25-35 min"
+      },
+      {
+        "id": 3,
+        "name": "Burger Heaven",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "American, Fast Food",
+        "rating": 4.0,
+        "ratingCount": "750+",
+        "eta": "20-30 min"
+      },
+      {
+        "id": 4,
+        "name": "Sushi Express",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Japanese, Sushi",
+        "rating": 4.7,
+        "ratingCount": "1200+",
+        "eta": "35-45 min"
+      },
+      {
+        "id": 5,
+        "name": "Delicious Bites",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Italian, Chinese",
+        "rating": 4.2,
+        "ratingCount": "500+",
+        "eta": "30-40 min"
+      },
+      {
+        "id": 6,
+        "name": "Spice Paradise",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Indian, Thai",
+        "rating": 4.5,
+        "ratingCount": "1000+",
+        "eta": "25-35 min"
+      },
+      {
+        "id": 7,
+        "name": "Burger Heaven",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "American, Fast Food",
+        "rating": 4.0,
+        "ratingCount": "750+",
+        "eta": "20-30 min"
+      },
+      {
+        "id": 8,
+        "name": "Sushi Express",
+        "image": "https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg",
+        "cuisine": "Japanese, Sushi",
+        "rating": 4.7,
+        "ratingCount": "1200+",
+        "eta": "35-45 min"
+      }
+    ]
+  }
