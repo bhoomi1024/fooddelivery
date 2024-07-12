@@ -6,11 +6,11 @@ import RestaurantSidebar from '../../components/AfterLoginRestaurantCompo/Restau
 const RestaurantLayout = () => {
   return (
     <>
-    <RestaurantNavbar/>
-  <div className='flex'>
-  <RestaurantSidebar/>
-  <Outlet/>
-  </div>
+      <RestaurantNavbar />
+      <div className='flex'>
+        <RestaurantSidebar />
+        <Outlet />
+      </div>
     </>
   )
 }

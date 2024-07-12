@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import RestaurantMenuCard from '../../components/AfterLoginRestaurantCompo/RestaurantMenu.jsx/RestaurantMenuCard'
 import { MenuData } from './ResMenuCardData/ResMenuCardData';
 import { IoMdAdd } from "react-icons/io"; 
-import Modal from '../../components/AfterLoginRestaurantCompo/RestaurantMenu.jsx/RestaurantMenuForm';
+import Modal from '../../components/AfterLoginRestaurantCompo/RestaurantMenu.jsx/RestaurantAddMenuForm';
+import RestaurantMenuCard from '../../components/AfterLoginRestaurantCompo/RestaurantMenu.jsx/RestaurantMenuCard';
 
-const ResMenu = () => {
+
+const Menu = () => {
   const [show, setShow] = useState(false);
 
   const showModal = () => {
@@ -53,4 +54,4 @@ const ResMenu = () => {
   )
 }
 
-export default ResMenu
+export default Menu

@@ -2,7 +2,7 @@ import React from 'react'
 import { MdEdit } from "react-icons/md";
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-const ResDetails = () => {
+const Details = () => {
     // will be fetched from backend
     const restaurantData = {
         restaurantName: "Haldiram's",
@@ -38,7 +38,7 @@ const ResDetails = () => {
         event.preventDefault();
         try {
             const response = await fetch("https://your-api-url", {
-                method: "POST",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -151,7 +151,7 @@ const ResDetails = () => {
                             type="text"
                             id="address"
                             placeholder="Address"
-                            className="mt-1 ml-2 px-3 py-2 w-[352px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 ml-2 px-3 py-2 w-[349px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             required
@@ -179,7 +179,7 @@ const ResDetails = () => {
                             type="time"
                             id="Closing hour"
                             placeholder="Closing time"
-                            className="mt-1 ml-2 px-3 py-2 w-[288px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 ml-2 px-3 py-2 w-[290px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
                             value={closingHour}
                             onChange={(e) => setClosingHour(e.target.value)}
                             required
@@ -217,6 +217,7 @@ const ResDetails = () => {
                             disabled={!editable}
                         />
                     </span>
+                    
                 </div>
                 {editable && <div className='flex justify-center gap-x-4'>
                     <button
@@ -239,4 +240,4 @@ const ResDetails = () => {
     )
 }
 
-export default ResDetails
+export default Details

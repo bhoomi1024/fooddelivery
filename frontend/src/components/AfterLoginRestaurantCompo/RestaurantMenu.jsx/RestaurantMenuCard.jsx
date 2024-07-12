@@ -1,24 +1,36 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useRef } from 'react'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ResEditDelMenuDialog from './ResEditDelMenuDialog';
 
-const RestaurantMenuCard = (props) => {
-    const [show, setShow] = useState(false);
 
-    const showEditDelDialog = () => {
-      setShow(true);
+const RestaurantMenuCard = (props) => {
+    const [inStock, setInStock] = useState(true);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const dialogRef = useRef(null);
+    const buttonRef = useRef(null);
+
+    const handleClickOutside = (event) => {
+        if (
+            dialogRef.current &&
+            !dialogRef.current.contains(event.target) &&
+            !buttonRef.current.contains(event.target)
+        ) {
+            setIsDialogOpen(false);
+        }
     };
-  
-    const hideEditDelDialog = () => {
-      setShow(false);
-    };
+
     useEffect(() => {
-      if (show) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
-    }, [show]);
+        if (isDialogOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        // to unmount the event listener 
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isDialogOpen]);
+
     return (
         <>
             <div className='flex items-center my-8 mx-24 border border-neutral-300 bg-white rounded-xl'>
@@ -31,16 +43,24 @@ const RestaurantMenuCard = (props) => {
                             {props.title}
                         </h1>
                         <div className='flex gap-x-3'>
-                            <label class="inline-flex items-center cursor-pointer">
-                            <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-3">Out of stock</span>
-                                <input type="checkbox" value="" class="sr-only peer" />                             
-                                <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
-                                
+                            <label className="inline-flex items-center cursor-pointer">
+                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-3">{inStock ? `In Stock` : `Out of Stock`}</span>
+                                <input type="checkbox" checked={inStock} value="" className="sr-only peer "
+                                    onClick={() => setInStock(!inStock)} />
+                                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+
                             </label>
-                            <button onClick={showEditDelDialog}>
-                                <BsThreeDotsVertical size={20}/>
-                            </button>
-                            <ResEditDelMenuDialog show={show} hideEditDelDialog={hideEditDelDialog}/>
+                            <div className='flex relative'>
+                                <button className='hover:bg-neutral-200 hover:rounded-full p-2'
+                                onClick={() => { setIsDialogOpen(!isDialogOpen) }} 
+                                ref={buttonRef}>
+                                    <BsThreeDotsVertical size={20} />
+                                    </button>
+                                {isDialogOpen && (
+                                    <ResEditDelMenuDialog 
+                                    ref={dialogRef} />
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div>

@@ -1,54 +1,45 @@
-import React from 'react'
 import { FiEdit } from "react-icons/fi";
 import { AiOutlineDelete } from "react-icons/ai";
+import { forwardRef, useState } from "react";
+import DeleteDialog from "./ResDeleteDialog";
+import ResEditMenuForm from "./ResEditMenuForm";
 
-const ResEditDelMenuDialog = ({ show, hideEditDelDialog }) => {
+const ResEditDelMenuDialog = forwardRef((_, dialogRef) => {
+    const [delDialog, setDelDialog] = useState(false);
+    const [editDialog, setEditDialog] = useState(false);
+
     return (
         <>
-            <div className={` absolute inset-x-0 inset-y-auto m-0 translate-x-[1012px] translate-y-[10px] z-10  ${show ? '' : 'hidden'} `}>
-                <div className='w-48 h-[99px] py-2 m-2 shadow-lg bg-white rounded-md border border-gray-200'>
+            <div className="absolute right-0 mt-8 mr-4 py-2 w-48 h-[99px] bg-white border border-gray-200 rounded-md shadow-lg" ref={dialogRef}>
+
                 <ul className="  font-poppins">
-                    <li className='w-full hover:bg-gray-100'>
-                        <a className='flex items-center p-2 gap-x-4' href="">
-                            <span className='ml-3'><FiEdit/></span>
+                    <li className='w-full hover:bg-gray-100'
+                        onClick={() => { setEditDialog(true) }}
+                    >
+                        <button className='flex items-center p-2 gap-x-4' >
+                            <span className='ml-3'><FiEdit /></span>
                             <span>Edit item</span>
-                        </a>
+                        </button>
                     </li>
-                    <li className='w-full hover:bg-gray-100'>
-                        <a className='flex items-center p-2 gap-x-4' href="">
-                            <span className='ml-3'><AiOutlineDelete size={18}/></span>
+                    <li className='w-full hover:bg-gray-100'
+                        onClick={() => { setDelDialog(true) }}>
+                        <button className='flex items-center p-2 gap-x-4' >
+                            <span className='ml-3'><AiOutlineDelete size={18} /></span>
                             <span>Delete item</span>
-                        </a>
+                        </button>
+
                     </li>
                 </ul>
-                </div>
-
-
-                {/*                 
-                <div className="fixed inset-0 "> 
-                                    
-                </div>
-                <div className="flex flex-col bg-white shadow-lg rounded-lg p-6 z-10 w-44 font-poppins">
-                    <div className='flex bg-purple-200'>
-                        <span>
-                            <FiEdit/>
-                        </span>
-                        <span>
-                            Edit
-                        </span>
-                    </div>
-                    <div className='flex bg-green-200'>
-                        <span>
-                            <LuDelete/>
-                        </span>
-                        <span>
-                          Delete item
-                        </span>
-                    </div>
-                </div> */}
+                <DeleteDialog show={delDialog} handleClose={() => {
+                    setDelDialog(false);
+                }} />
+                <ResEditMenuForm show={editDialog} handleClose={() => {
+                    setEditDialog(false);
+                }} />
             </div>
         </>
     )
-}
+})
 
+ResEditDelMenuDialog.displayName = 'ResEditDelMenuDialog'
 export default ResEditDelMenuDialog
