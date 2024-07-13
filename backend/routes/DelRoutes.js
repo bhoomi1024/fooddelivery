@@ -2,27 +2,33 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from 'nodemailer';
-import UserModel from "../models/UserModel.js";
+import DeliveryModel from "../models/DelModel.js";
 
 const router = express.Router();
 
 // Register Route
-router.post('/user/register', async (req, res) => {
-  const { ownerName, password, email, phone } = req.body;
+router.post('/delivery/register', async (req, res) => {
+  const { ownerName, password, drivingLicenceNo, phone, email,
+     city, address, countryName, stateName } = req.body;
 
   try {
-    let user = await UserModel.findOne({ email });
+    let user = await DeliveryModel.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = new UserModel({
+    user = new DeliveryModel({
       ownerName,
       password: hashedPassword,
+      drivingLicenceNo,
       phone,
       email,
+      city,
+      address,
+      countryName,
+      stateName
     });
 
     await user.save();
@@ -34,11 +40,11 @@ router.post('/user/register', async (req, res) => {
 });
 
 // Login Route
-router.post('/UserLogin', async (req, res) => {
+router.post('/DelLogin', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await DeliveryModel.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User is not registered" });
     }
@@ -59,11 +65,11 @@ router.post('/UserLogin', async (req, res) => {
 });
 
 // Forgot Password Route
-router.post('/UserForgotPasswordDialog', async (req, res) => {
+router.post('/DelForgotPasswordDialog', async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await DeliveryModel.findOne({ email });
     if (!user) {
       return res.json({ message: "User not registered" });
     }
@@ -88,12 +94,13 @@ We received a request to reset your FoodieBuddy password. If you made this reque
 
 If you didn't request a password reset, please ignore this email or let us know.
 
-http://localhost:5173/UserResetPassword/${token}
+http://localhost:5173/DelResetPassword/${token}
 
 Thank you for being a part of the FoodieBuddy community!
 
 Best regards,
-The FoodieBuddy Team`
+The FoodieBuddy Delivery Partners Team
+`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -112,7 +119,7 @@ The FoodieBuddy Team`
 });
 
 // Reset Password Route
-router.post('/UserResetPassword/:token', async (req, res) => {
+router.post('/DelResetPassword/:token', async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
@@ -121,7 +128,7 @@ router.post('/UserResetPassword/:token', async (req, res) => {
     const id = decoded.id;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await UserModel.findOneAndUpdate({ _id: id }, { password: hashedPassword });
+    await DeliveryModel.findOneAndUpdate({ _id: id }, { password: hashedPassword });
 
     return res.json({ status: 'success', message: 'Password updated' });
   } catch (err) {

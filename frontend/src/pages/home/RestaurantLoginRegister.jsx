@@ -37,7 +37,7 @@ const RestaurantLoginRegister = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await Axios.post("http://localhost:3000/auth/register", {
+      const response = await Axios.post("http://localhost:3000/auth/res/register", {
         ownerName,
         password,
         restaurantName,
