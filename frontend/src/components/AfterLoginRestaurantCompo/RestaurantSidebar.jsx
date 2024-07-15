@@ -11,13 +11,13 @@ const RestaurantSidebar = () => {
     { title: 'Dashboard', icon: <SpaceDashboardIcon sx={{fontSize:30}}/>,
      path: '/RestaurantLayout/ResDashBoard' },
     { title: 'Orders', icon: <ShoppingBagIcon sx={{fontSize:30}}/>, 
-    path: '/RestaurantLayout/ResOrder' },
+    path: '/RestaurantLayout/ResOrders' },
     { title: 'Menu', icon: <RestaurantMenuIcon sx={{fontSize:30}}/>,
      path: '/RestaurantLayout/ResMenu' },
     { title: 'Details', icon: <InfoIcon sx={{fontSize:30}}/>, 
     path: '/RestaurantLayout/ResDetails' },
     { title: 'Logout', icon: <LogoutIcon sx={{fontSize:30}}/>, 
-    path: '/ResLogin"' },
+    path: '/ResLogin' },
   ]
   return (
     <>

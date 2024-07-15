@@ -26,6 +26,7 @@ import UsersRestaurant from "./pages/Users/usershome/UsersRestaurant.jsx"
 import Usersliked from "./pages/Users/liked/Usersliked.jsx";
 import UsersOrders from "./pages/Users/orders/Usersorders.jsx";
 import UsersDishes from "./pages/Users/Dishes/UsersDishes.jsx";
+import ResOrders from "./pages/restaurant/ResOrders.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Layout />}>
@@ -43,9 +44,11 @@ const router = createBrowserRouter(
 
       <Route path="RestaurantLayout" element={<RestaurantLayout />}>
         <Route path="ResDashBoard" element={< ResDashBoard />} />
+        <Route path="ResOrders" element={<ResOrders/>} />
         <Route path="ResDetails" element={<ResDetails />} />
         <Route path="ResMenu" element={< ResMenu />} />
       </Route>
+      {/* <Route path="ResLogin" element */}
     </Route>
   )
 );

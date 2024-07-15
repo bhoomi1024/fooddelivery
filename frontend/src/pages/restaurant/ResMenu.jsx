@@ -47,6 +47,7 @@ const Menu = () => {
             title={menuItem.dishTitle}
             description={menuItem.description}
             price={menuItem.price}
+            cuisineName = {menuItem.cuisineName}
           />
         ))}
       </div>

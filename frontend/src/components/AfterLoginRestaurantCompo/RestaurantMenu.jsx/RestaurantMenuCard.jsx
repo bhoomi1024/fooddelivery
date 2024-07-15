@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ResEditDelMenuDialog from './ResEditDelMenuDialog';
 
@@ -39,9 +39,14 @@ const RestaurantMenuCard = (props) => {
                 </div>
                 <div className='flex flex-col gap-y-3 ml-5 py-4 w-[700px]'>
                     <div className='flex justify-between items-center max-w-[680px]'>
-                        <h1 className='text-xl font-semibold'>
-                            {props.title}
-                        </h1>
+                        <div className='flex gap-x-8'>
+                            <h1 className='text-xl font-semibold'>
+                                {props.title}
+                            </h1>
+                            <div className='bg-neutral-200 rounded-lg text-sm px-2 py-1'>
+                                {props.cuisineName}
+                            </div>
+                        </div>
                         <div className='flex gap-x-3'>
                             <label className="inline-flex items-center cursor-pointer">
                                 <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-3">{inStock ? `In Stock` : `Out of Stock`}</span>
@@ -52,13 +57,13 @@ const RestaurantMenuCard = (props) => {
                             </label>
                             <div className='flex relative'>
                                 <button className='hover:bg-neutral-200 hover:rounded-full p-2'
-                                onClick={() => { setIsDialogOpen(!isDialogOpen) }} 
-                                ref={buttonRef}>
+                                    onClick={() => { setIsDialogOpen(!isDialogOpen) }}
+                                    ref={buttonRef}>
                                     <BsThreeDotsVertical size={20} />
-                                    </button>
+                                </button>
                                 {isDialogOpen && (
-                                    <ResEditDelMenuDialog 
-                                    ref={dialogRef} />
+                                    <ResEditDelMenuDialog
+                                        ref={dialogRef} />
                                 )}
                             </div>
                         </div>

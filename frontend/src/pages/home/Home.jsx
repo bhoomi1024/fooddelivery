@@ -10,7 +10,7 @@ const Home = () => {
   const repeatedData = Array.from({ length: 12 }, () => data).flat();
   return (
     <>
-      <div className="hidden w-full h-[550px] md:grid lg:grid-cols-2 bg-white mt-20">
+      <div className="hidden w-full h-[550px] md:grid lg:grid-cols-2 bg-yellow-300 mt-20">
         <div className="h-full flex flex-col items-center ">
           
           {/*grid column 1 containing image */}
@@ -18,7 +18,7 @@ const Home = () => {
             <span>One stop</span>
             <span>for all your</span>
             <span>
-              <span className="text-green-600">Food </span>
+              <span className="text-green-700">Food </span>
               cravings
             </span>
           </h1>
@@ -33,7 +33,7 @@ const Home = () => {
           {" "}
           {/* grid column 2 containing image*/}
           <img
-            className="ml-20 mt-9 h-[460px] w-[485px]"
+            className="ml-20 mt-9 h-[460px] w-[485px] rounded-full"
             src={logo}
             alt="food delivery"
           />

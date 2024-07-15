@@ -8,6 +8,7 @@ const Modal = ({ show, handleClose }) => {
     const [dishName, setDishName] = useState("");
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState("");
+    const [cuisineName, setcuisineName] = useState("");
 
     // Define the spring animation for the modal
     const animation = useSpring({
@@ -23,7 +24,7 @@ const Modal = ({ show, handleClose }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ image, dishName, price, description }),
+                body: JSON.stringify({ image, dishName, price, description, cuisineName }),
             });
 
             if (!response.ok) {
@@ -40,9 +41,8 @@ const Modal = ({ show, handleClose }) => {
     return (
         <>
             {show && (
-                <div className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center backdrop-blur-sm z-10">
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50" onClick={handleClose}></div>
-                    <animated.div style={animation} className="bg-white rounded-lg p-6 z-10 w-1/3 font-display">
+                <div className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center backdrop-blur-sm z-10 bg-gray-600 bg-opacity-50">
+                    <animated.div style={animation} className="bg-white rounded-lg p-6 z-10 w-1/3 mt-16 font-display">
                         <form onSubmit={handleSubmit}>
                             <h1 className='font-bold text-xl pb-3'>
                                 Add new item
@@ -71,6 +71,21 @@ const Modal = ({ show, handleClose }) => {
                                         value={price}
                                         onChange={(e) => {
                                             setPrice(e.target.value)
+                                        }}
+                                        required />
+                                </div>
+                            </div>
+                            <div>
+                                <div className='mb-2'>
+                                    <label htmlFor="cuisine" className="block mb-1 text-sm font-medium text-gray-900">Cuisine Type</label>
+                                    <input
+                                        type="text"
+                                        name="cusine"
+                                        id="cuisine"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter Cuisine Type"
+                                        value={cuisineName}
+                                        onChange={(e) => {
+                                            setcuisineName(e.target.value)
                                         }}
                                         required />
                                 </div>
