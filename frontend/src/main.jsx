@@ -21,6 +21,16 @@ import ResDashBoard from "./pages/restaurant/ResDashboard.jsx";
 import RestaurantLayout from "./pages/restaurant/RestaurantLayout.jsx";
 import ResDetails from "./pages/restaurant/ResDetails.jsx";
 
+import UserLoginRegister from './pages/home/UserLoginRegister.jsx'
+import UserForgotPasswordDialog from "./components/UserLoginRegisterCompo/UserForgotPasswordDialog.jsx";
+import UserLogin from "./components/UserLoginRegisterCompo/UserLogin.jsx";
+import UserResetPassword from "./components/UserLoginRegisterCompo/UserResetPassword.jsx";
+
+import DelForgotPasswordDialog from './components/DeliveryLoginRegisterCompo/DelForgotPasswordDialog.jsx';
+import DelLogin from './components/DeliveryLoginRegisterCompo/DelLogin.jsx'
+import DelResetPassword from './components/DeliveryLoginRegisterCompo/DelResetPassword.jsx';
+import DeliverypartnerLoginRegister from './pages/home/DeliverypartnerLoginRegister.jsx'
+import DelLayout from "./pages/Delivery/DelLayout.jsx";
 
 import UsersRestaurant from "./pages/Users/usershome/UsersRestaurant.jsx"
 import Usersliked from "./pages/Users/liked/Usersliked.jsx";
@@ -37,10 +47,25 @@ const router = createBrowserRouter(
       <Route path="ResForgotPasswordDialog" element={<ResForgotPasswordDialog />} />
       <Route path="/ResResetPassword/:token" element={<ResResetPassword />} />
 
+
+      <Route path="UserLoginRegister" element={<UserLoginRegister/>} />
+      <Route path="UserForgotPasswordDialog" element={<UserForgotPasswordDialog/>} />
+      <Route path="UserLogin" element={<UserLogin/>} />
+      <Route path="/UserResetPassword/:token" element={<UserResetPassword/>} />
+
+
+      <Route path="DeliverypartnerLoginRegister" element={<DeliverypartnerLoginRegister/>} />
+      <Route path="DelForgotPasswordDialog" element={<DelForgotPasswordDialog/>} />
+      <Route path="DelLogin" element={<DelLogin/>} />
+      <Route path="/DelResetPassword/:token" element={<DelResetPassword/>} />
+      <Route path="DelLayout" element={<DelLayout/>} />
+
       <Route path="/UsersRestaurant" element={<UsersRestaurant />} />
       <Route path="/Usersliked" element={<Usersliked />} />
       <Route path="/UsersOrders" element={<UsersOrders />} />
       <Route path="/UsersDishes" element={<UsersDishes />} />
+
+
 
       <Route path="RestaurantLayout" element={<RestaurantLayout />}>
         <Route path="ResDashBoard" element={< ResDashBoard />} />

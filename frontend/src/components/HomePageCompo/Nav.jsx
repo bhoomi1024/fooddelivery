@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { SiGreasyfork } from "react-icons/si";
 
 const Nav = () => {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn,setLoggedIn] = useState(true);
 
   return (
     <div className="h-20 w-full fixed z-[50] bg-white top-0">
@@ -28,17 +28,14 @@ const Nav = () => {
               </li>
             </Link>
 
-            {/* If restaurant is logged in then it goes to admin dashboard else it goes to login for restaurant */}
-            {/* Commented to test Restaurant page */}
-
-            {/* <Link to= "/RestaurantLoginRegister"> */}
-            <Link to="RestaurantLayout">
-              <li className="hover:cursor-pointer hover:scale-[0.975]">
-                Restaurant login
-              </li>
+          {/* If restaurant is logged in then it goes to admin dashboard else it goes to login for restaurant */}
+            <Link to= "/RestaurantLoginRegister">
+            <li className="hover:cursor-pointer hover:scale-[0.975]">
+              Restaurant login
+            </li>
             </Link>
 
-            <Link to="/ResLogin">
+            <Link to="/UserLoginRegister">
               <li className="flex justify-center items-center gap-x-1 hover:cursor-pointer hover:scale-[0.975]">
                 Login/Register <VscAccount size={20} />
               </li>
