@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSpring, animated } from '@react-spring/web';
 
-const ResEditMenuForm = ({ show, handleClose,props }) => {
+const ResEditMenuForm = ({ show, handleClose, props }) => {
     const [image, setImage] = useState(null);
     const [dishName, setDishName] = useState("");
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState("");
+    const [cuisineName, setcuisineName] = useState("");
 
     // Define the spring animation for the modal
     const animation = useSpring({
@@ -23,7 +24,7 @@ const ResEditMenuForm = ({ show, handleClose,props }) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ image, dishName, price, description }),
+                body: JSON.stringify({ image, dishName, price, description, cuisineName }),
             });
 
             if (!response.ok) {
@@ -40,9 +41,8 @@ const ResEditMenuForm = ({ show, handleClose,props }) => {
     return (
         <>
             {show && (
-                <div className="fixed inset-0 flex items-center justify-center">
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50" onClick={handleClose}></div>
-                    <animated.div style={animation} className="bg-white rounded-lg p-6 z-10 w-1/3 font-display">
+                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-gray-600 bg-opacity-50 z-10">
+                    <animated.div style={animation} className="bg-white rounded-lg p-6 z-10 w-1/3 font-display mt-16">
                         <form onSubmit={handleSubmit}>
                             <h1 className='font-bold text-xl pb-3'>
                                 Edit item
@@ -55,7 +55,7 @@ const ResEditMenuForm = ({ show, handleClose,props }) => {
                                         name="name"
                                         id="name"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                        
+
                                         value={dishName}
                                         onChange={(e) => {
                                             setDishName(e.target.value)
@@ -74,6 +74,19 @@ const ResEditMenuForm = ({ show, handleClose,props }) => {
                                         }}
                                         required />
                                 </div>
+                            </div>
+                            <div className='mb-2'>
+                                <label htmlFor="cuisine" className="block mb-1 text-sm font-medium text-gray-900">Cuisine Type</label>
+                                <input
+                                    type="text"
+                                    name="cuisine" 
+                                    id="cuisine"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter"
+                                    value={cuisineName}
+                                    onChange={(e) => {
+                                        setcuisineName(e.target.value)
+                                    }}
+                                    required />
                             </div>
                             <div className='mb-2'>
                                 <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Product Description</label>

@@ -30,7 +30,7 @@ const Details = () => {
 
     const handleCancel = () => {
         setEditable(false);
-        // window.location.reload(false);
+        window.location.reload(false);
 
     }
 
@@ -61,13 +61,13 @@ const Details = () => {
 
     }
     return (
-        <div className='bg-gray-100 ml-60 mt-[78px] h-[520px] w-full font-display'>
-            <form className='my-4 mx-24 flex flex-col bg-white gap-y-4 pb-4' onSubmit={handleSubmit}>
+        <div className='bg-gray-100 ml-60 mt-[78px] w-full font-display'>
+            <form className='my-8 mx-32 flex flex-col bg-white gap-y-4 pb-8 shadow-md' onSubmit={handleSubmit}>
                 <div className='flex '>
                     <div className='w-full'>
                         <h1 className='flex justify-center items-center font-bold text-3xl mt-4'>
                             {restaurantName}
-                        </h1>
+                        </h1> 
                     </div>
                     <button className='p-2 mt-4 flex justify-end items-center mr-10 bg-gray-100 rounded-md hover:bg-gray-200'
                         onClick={() => setEditable(true)}
@@ -75,149 +75,139 @@ const Details = () => {
                         <MdEdit size={24} />
                     </button>
                 </div>
-                <div className='space-x-12 mx-6'>
-                    <span >
-                        Restaurant Name :
+                <div className='flex justify-center gap-x-10 '>
+                    <div className='w-80'>
+                        <label htmlFor="resName" className="block mb-1 ml-1 text-sm font-semibold text-gray-900 ">Restaurant Name</label>
                         <input
                             type="text"
-                            id="restaurantName"
-                            placeholder="Restaurant Name"
-                            className="mt-1 ml-2 px-3 py-2 w-[284px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            id="restaurant name"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={restaurantName}
-                            onChange={(e) => setRestaurantName(e.target.value)}
-                            required
-                            disabled={!editable}
-                        />
-                    </span>
-                    <span>
-                        Owner Name :
+                            onChange={(e) =>
+                               { setRestaurantName(e.target.value)}}
+                            required 
+                            disabled={!editable}/>
+                    </div>
+                    <div className='w-80'>
+                        <label htmlFor="resOwner" className="block mb-1 ml-1 text-sm font-semibold text-gray-900">Owner's Name</label>
                         <input
                             type="text"
-                            id="ownerName"
-                            placeholder="Owner's Name"
-                            className="mt-1 ml-2 px-3 py-2 w-72 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            id="Owner name"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={ownerName}
                             onChange={(e) => setOwnerName(e.target.value)}
                             required
-                            disabled={!editable}
-                        />
-                    </span>
+                            disabled={!editable}/>
+                    </div>
                 </div>
-                <div className='space-x-14 mx-6'>
-                    <span >
-                        Country Name :
+                
+                <div className='flex justify-center gap-x-10'>
+                    <div className='w-80'>
+                        <label htmlFor="country" className="block mb-1 ml-1 text-sm font-semibold text-gray-900 ">Country Name</label>
                         <input
-                            type="text"
+                            type="text"                            
                             id="country"
-                            placeholder="Country"
-                            className="mt-1 ml-2 px-3 py-2 w-[302px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={country}
-                            onChange={(e) => setCountry(e.target.value)}
-                            required
-                            disabled={!editable}
-                        />
-                    </span>
-                    <span>
-                        State Name :
+                            onChange={(e) =>
+                               { setCountry(e.target.value)}}
+                            required 
+                            disabled={!editable}/>
+                    </div>
+                    <div className='w-80'>
+                        <label htmlFor="state" className="block mb-1 ml-1 text-sm font-semibold text-gray-900">State Name</label>
                         <input
                             type="text"
-                            id="stateName"
-                            placeholder="State"
-                            className="mt-1 ml-2 px-3 py-2 w-[293px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            id="state"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={state}
                             onChange={(e) => setState(e.target.value)}
                             required
-                            disabled={!editable}
-                        />
-                    </span>
+                            disabled={!editable}/>
+                    </div>
                 </div>
-                <div className='space-x-28 mx-6'>
-                    <span >
-                        City :
+                
+                <div className='flex justify-center gap-x-10'>
+                    <div className='w-80'>
+                        <label htmlFor="city" className="block mb-1 ml-1 text-sm font-semibold text-gray-900 ">City</label>
                         <input
-                            type="text"
+                            type="text"                            
                             id="city"
-                            placeholder="City"
-                            className="mt-1 ml-2 px-3 py-2 w-72 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            required
-                            disabled={!editable}
-                        />
-                    </span>
-                    <span>
-                        Address :
+                            onChange={(e) =>
+                               { setCity(e.target.value)}}
+                            required 
+                            disabled={!editable}/>
+                    </div>
+                    <div className='w-80'>
+                        <label htmlFor="address" className="block mb-1 ml-1 text-sm font-semibold text-gray-900">Address</label>
                         <input
                             type="text"
                             id="address"
-                            placeholder="Address"
-                            className="mt-1 ml-2 px-3 py-2 w-[349px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             required
-                            disabled={!editable}
-                        />
-                    </span>
+                            disabled={!editable}/>
+                    </div>
                 </div>
-                <div className='space-x-16 mx-6'>
-                    <span >
-                        Opening Hour :
+                
+                
+                <div className='flex justify-center gap-x-10'>
+                    <div className='w-80'>
+                        <label htmlFor="openingTime" className="block mb-1 ml-1 text-sm font-semibold text-gray-900 ">Opening Hour</label>
                         <input
-                            type="time"
-                            id="opening Hour"
-                            placeholder="Opening time"
-                            className="mt-1 ml-2 px-3 py-2 w-[288px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            type="time"                            
+                            id="openingTime"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={openingHour}
-                            onChange={(e) => setOpeningHour(e.target.value)}
-                            required
-                            disabled={!editable}
-                        />
-                    </span>
-                    <span>
-                        Closing Hour :
+                            onChange={(e) =>
+                               { setOpeningHour(e.target.value)}}
+                            required 
+                            disabled={!editable}/>
+                    </div>
+                    <div className='w-80'>
+                        <label htmlFor="closingTime" className="block mb-1 ml-1 text-sm font-semibold text-gray-900">Closing Hour</label>
                         <input
                             type="time"
-                            id="Closing hour"
-                            placeholder="Closing time"
-                            className="mt-1 ml-2 px-3 py-2 w-[290px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            id="closingTime"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={closingHour}
                             onChange={(e) => setClosingHour(e.target.value)}
                             required
-                            disabled={!editable}
-                        />
-                    </span>
+                            disabled={!editable}/>
+                    </div>
                 </div>
-                <div className='ml-6 font-bold -mb-2'>
+
+                <div className='ml-[90px] font-bold -mb-2'>
                     Contact details:
                 </div>
-                <div className='space-x-32 mx-6 mb-4'>
-                    <span >
-                        Contact number :
+                
+                <div className='flex justify-center gap-x-10'>
+                    <div className='w-80'>
+                        <label htmlFor="contact" className="block mb-1 ml-1 text-sm font-semibold text-gray-900 ">Contact</label>
                         <input
-                            type="text"
+                            type="text"                            
                             id="contact"
-                            placeholder="Contact number"
-                            className="mt-1 ml-2 px-3 py-2 w-60 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={contactNo}
-                            onChange={(e) => setContactNo(e.target.value)}
-                            required
-                            disabled={!editable}
-                        />
-                    </span>
-                    <span>
-                        Email Id :
+                            onChange={(e) =>
+                               { setContactNo(e.target.value)}}
+                            required 
+                            disabled={!editable}/>
+                    </div>
+                    <div className='w-80'>
+                        <label htmlFor="email" className="block mb-1 ml-1 text-sm font-semibold text-gray-900">Email</label>
                         <input
                             type="email"
                             id="email"
-                            placeholder="Email"
-                            className="mt-1 ml-2 px-3 py-2 w-[296px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:border-blue-500 focus:ring-blue-500 block w-full px-3 py-2"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            disabled={!editable}
-                        />
-                    </span>
-                    
+                            disabled={!editable}/>
+                    </div>
                 </div>
                 {editable && <div className='flex justify-center gap-x-4'>
                     <button

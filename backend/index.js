@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
-import UserRouter from "./routes/UserRoutes.js";
+import ResRouter from "./routes/ResRoutes.js";
+import UserRoutes from './routes/UserRoutes.js';
+import DelRoutes from './routes/DelRoutes.js'
 import cookieParser from "cookie-parser";
 dotenv.config();
 const app = express();
@@ -17,7 +19,9 @@ app.use(cors({
 }));
 
 app.use(cookieParser())
-app.use('/auth', UserRouter);
+app.use('/auth', ResRouter);
+app.use('/auth', UserRoutes);
+app.use('/auth', DelRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

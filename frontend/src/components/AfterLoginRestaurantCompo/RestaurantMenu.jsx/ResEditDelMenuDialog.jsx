@@ -4,7 +4,7 @@ import { forwardRef, useState } from "react";
 import DeleteDialog from "./ResDeleteDialog";
 import ResEditMenuForm from "./ResEditMenuForm";
 
-const ResEditDelMenuDialog = forwardRef((_, dialogRef) => {
+const ResEditDelMenuDialog = forwardRef((props, dialogRef) => {
     const [delDialog, setDelDialog] = useState(false);
     const [editDialog, setEditDialog] = useState(false);
 
@@ -30,10 +30,10 @@ const ResEditDelMenuDialog = forwardRef((_, dialogRef) => {
 
                     </li>
                 </ul>
-                <DeleteDialog show={delDialog} handleClose={() => {
+                <DeleteDialog id={props.id} show={delDialog} handleClose={() => {
                     setDelDialog(false);
                 }} />
-                <ResEditMenuForm show={editDialog} handleClose={() => {
+                <ResEditMenuForm id={props.id} show={editDialog} handleClose={() => {
                     setEditDialog(false);
                 }} />
             </div>

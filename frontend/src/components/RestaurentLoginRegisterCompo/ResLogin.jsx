@@ -90,8 +90,8 @@ const ResLogin = () => {
           </nav>
         </div>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center mt-20 lg:mt-32">
-        <div className="w-full max-w-md p-8 bg-white shadow-md rounded-md mx-4 lg:mx-0">
+      <div className="flex-1 flex flex-col items-center justify-center bg-neutral-100">
+        <div className="w-full max-w-md p-8 bg-white shadow-md rounded-lg mx-4 lg:mx-0 mt-20 mb-20 lg:mt-32">
           <h2 className="text-2xl font-bold mb-4">Login</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={handleLogin}>

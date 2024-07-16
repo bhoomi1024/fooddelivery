@@ -23,7 +23,9 @@ const Menu = () => {
     }
   }, [show]);
 
+  // will be fetched from backend
   const repeatedItem = Array.from({ length: 12 }, () => MenuData).flat();
+
   return (
     <>
       <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins'>
@@ -39,14 +41,17 @@ const Menu = () => {
           </div>
         </div>
         <Modal show={show} handleClose={hideModal}/>  
-            
-        {repeatedItem.map((menuItem, index) => (
+
+        {repeatedItem.map((menuItem) => (
           <RestaurantMenuCard
-            key={index}
+            key={menuItem.id}
+            cardId={menuItem.id}
+            inStock = {menuItem.inStock}
             src={menuItem.src}
             title={menuItem.dishTitle}
             description={menuItem.description}
             price={menuItem.price}
+            cuisineName = {menuItem.cuisineName}
           />
         ))}
       </div>
