@@ -62,12 +62,12 @@ const Details = () => {
     }
     return (
         <div className='bg-gray-100 ml-60 mt-[78px] w-full font-display'>
-            <form className='my-4 mx-32 flex flex-col bg-white gap-y-4 pb-4' onSubmit={handleSubmit}>
+            <form className='my-8 mx-32 flex flex-col bg-white gap-y-4 pb-8 shadow-md' onSubmit={handleSubmit}>
                 <div className='flex '>
                     <div className='w-full'>
                         <h1 className='flex justify-center items-center font-bold text-3xl mt-4'>
                             {restaurantName}
-                        </h1>
+                        </h1> 
                     </div>
                     <button className='p-2 mt-4 flex justify-end items-center mr-10 bg-gray-100 rounded-md hover:bg-gray-200'
                         onClick={() => setEditable(true)}

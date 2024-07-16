@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useSpring, animated } from '@react-spring/web';
 
-const DeleteDialog = ({ show, handleClose }) => {
+const DeleteDialog = ({ show, handleClose,id }) => {
 
     // Define the spring animation for the modal
     const animation = useSpring({

@@ -5,6 +5,7 @@ import ResDashboardCard from '../../components/AfterLoginRestaurantCompo/ResDash
 
 
 function ResDashboard() {
+  //Total menus, total revenue, items sold, No of orders will be fetched from backend 
   const repeatedCard = Array.from({ length: 4 }, () => ResDashboardCardData).flat();
   return (
     <>
