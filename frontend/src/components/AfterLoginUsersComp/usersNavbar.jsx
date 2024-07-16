@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { FaSearch, FaShoppingCart, FaHeart, FaUser, FaSearch as FaSearchIcon } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { ShoppingBag, LogOut, Heart, UserRound, ShoppingCart } from 'lucide-react';
 import { SiGreasyfork } from 'react-icons/si';
 
-import { Link } from 'react-router-dom';
-import { ShoppingBag, LogOut, Heart, UserRound, ShoppingCart,Search,Sun   } from 'lucide-react';
-
-const Navbar = () => {
+const Navbar = ({ cartCount, likedCount }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleDropdown = () => {
@@ -40,25 +38,34 @@ const Navbar = () => {
             <div className="ml-4 flex items-center md:ml-6">
             <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              
               <Link to="/UsersDishes" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Menu</Link>
-              
             </div>
           </div>
-            
-              <button className="ml-3 p-1">
+          <Link to="/UsersCart">
+              <button className="ml-3 p-1 relative">
                 <ShoppingCart className="h-6 w-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                    {cartCount}
+                  </span>
+                )}
               </button>
+              </Link>
               <Link to="/Usersliked">
-                <button className="ml-3 p-1">
+                <button className="ml-3 p-1 relative">
                   <Heart className="h-6 w-6" />
+                  {likedCount > 0 && (
+                    <span className="absolute -top-3 -right-4 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                      {likedCount}
+                    </span>
+                  )}
                 </button>
               </Link>
               <div className="relative">
                 <button onClick={toggleDropdown} className="ml-3 p-1">
                   <UserRound className="h-6 w-6" />
                 </button>
-                <span className='inline-block h-6 w-6 ml-2 '>Name</span>
+                <span className="inline-block h-6 w-6 ml-2">Name</span>
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                     <Link to="/UsersOrders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

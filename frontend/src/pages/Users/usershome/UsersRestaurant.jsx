@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar'
-import usersRestaurantdata from './usersRestaurantdata';
+import React, { useState, useEffect, useRef } from 'react';
+import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import UsersRestaurantDetails from './UsersRestaurantDetails';
-import { FaHeart } from 'react-icons/fa'; 
-import { ShoppingBag, LogOut, Heart, UserRound, ShoppingCart, Search, SlidersHorizontal, Tags, Star } from 'lucide-react';
-import Footer from '../../../components/HomePageCompo/Footer'
+import { FaHeart } from 'react-icons/fa';
+import FilterOptions from '../../../components/AfterLoginUsersComp/usersFilterdetails';
+import { SlidersHorizontal, Star, Search } from 'lucide-react';
+import Footer from '../../../components/HomePageCompo/Footer';
+import usersRestaurantData from './usersRestaurantdata.json';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UsersRestaurant = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,13 +17,23 @@ const UsersRestaurant = () => {
     rating: null,
     priceRange: null,
   });
-  const [filteredRestaurants, setFilteredRestaurants] = useState(usersRestaurantdata.restaurants);
+  const [filteredRestaurants, setFilteredRestaurants] = useState(usersRestaurantData.restaurants);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [likedRestaurants, setLikedRestaurants] = useState({});
+  const [rating4PlusSelected, setRating4PlusSelected] = useState(true); // State for "Ratings 4+" button
+
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    // Load liked restaurants from local storage
+    const storedLikes = JSON.parse(localStorage.getItem('likedRestaurants')) || {};
+    setLikedRestaurants(storedLikes);
+  }, []);
 
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    applyFilters(event.target.value);
+    const searchTerm = event.target.value;
+    setSearchTerm(searchTerm);
+    applyFilters(searchTerm);
   };
 
   const toggleFilters = () => {
@@ -28,31 +41,69 @@ const UsersRestaurant = () => {
   };
 
   const handleFilterChange = (category, value) => {
-    setFilters(prevFilters => {
-      if (category === 'cuisine') {
-        const newCuisines = prevFilters.cuisine.includes(value)
-          ? prevFilters.cuisine.filter(c => c !== value)
-          : [...prevFilters.cuisine, value];
-        return { ...prevFilters, cuisine: newCuisines };
-      } else {
-        return { ...prevFilters, [category]: value };
-      }
-    });
+    if (category === 'rating' && value === 4) {
+      // Toggle "Ratings 4+" button state
+      setRating4PlusSelected(!rating4PlusSelected);
+      // Update filter rating value
+      const newRating = rating4PlusSelected ? null : 4;
+      setFilters(prevFilters => ({ ...prevFilters, [category]: newRating }));
+      applyFilters(searchTerm, newRating); // Apply filters immediately
+    } else {
+      setFilters(prevFilters => ({
+        ...prevFilters,
+        [category]: value,
+      }));
+      applyFilters(searchTerm, value); // Apply filters immediately
+    }
   };
 
-  const applyFilters = (search = searchTerm) => {
-    const filtered = usersRestaurantdata.restaurants.filter(restaurant => {
-      const matchesSearchTerm = restaurant.name.toLowerCase().includes(search.toLowerCase());
-      const matchesCuisine = filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisine);
+  const applyFilters = (search, ratingFilter) => {
+    const filtered = usersRestaurantData.restaurants.filter((restaurant) => {
+      const firstLetter = restaurant.name.charAt(0).toLowerCase();
+      const searchFirstLetter = search.charAt(0).toLowerCase();
+      const matchesSearchTerm = firstLetter === searchFirstLetter || search === '';
+      const matchesCuisine =
+        filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisine);
       const matchesRating = filters.rating === null || restaurant.rating >= filters.rating;
-      const matchesPrice = filters.priceRange === null || restaurant.priceRange === filters.priceRange;
 
-      return matchesSearchTerm && matchesCuisine && matchesRating && matchesPrice;
+      return matchesSearchTerm && matchesCuisine && matchesRating;
     });
 
-    setFilteredRestaurants(filtered);
-    setShowFilters(false);
+    // Apply additional rating filter if Ratings 4+ is selected
+    if (rating4PlusSelected) {
+      const ratingFiltered = filtered.filter((restaurant) => restaurant.rating >= 4);
+      setFilteredRestaurants(ratingFiltered);
+    } else {
+      setFilteredRestaurants(filtered);
+    }
+
+    setShowFilters(false); // Close filters after applying
   };
+
+  const closeFilters = () => {
+    setShowFilters(false);
+    setRating4PlusSelected(false); // Reset "Ratings 4+" button state
+    setFilters({ cuisine: [], rating: null, priceRange: null }); // Reset filters
+    applyFilters(searchTerm, null); // Apply filters when closing popup
+  };
+
+  const handleClickOutside = (event) => {
+    if (filterRef.current && !filterRef.current.contains(event.target)) {
+      setShowFilters(false);
+      applyFilters(searchTerm, null); // Apply filters when clicking outside
+    }
+  };
+
+  useEffect(() => {
+    if (showFilters) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFilters]);
 
   const handleRestaurantClick = (restaurant) => {
     setSelectedRestaurant(restaurant);
@@ -64,21 +115,35 @@ const UsersRestaurant = () => {
 
   const handleLike = (e, restaurantId) => {
     e.stopPropagation();
-    setLikedRestaurants(prev => ({
-      ...prev,
-      [restaurantId]: !prev[restaurantId]
-    }));
+    setLikedRestaurants(prev => {
+      const isLiked = !prev[restaurantId];
+      const message = isLiked ? "Restaurant liked!" : "Restaurant unliked!";
+      toast(message, { type: isLiked ? "success" : "info" });
+
+      const updatedLikes = {
+        ...prev,
+        [restaurantId]: isLiked,
+      };
+
+      // Save liked restaurants to local storage
+      localStorage.setItem('likedRestaurants', JSON.stringify(updatedLikes));
+
+      return updatedLikes;
+    });
   };
+
+  const likedCount = Object.values(likedRestaurants).filter(Boolean).length;
 
   return (
     <>
-      <Navbar />
+      <Navbar likedCount={likedCount} />
+      <ToastContainer />
       <div className='bg-yellow-400 h-screen flex items-center overflow-hidden relative'>
         <div className='max-w-7xl mx-auto flex justify-between items-center px-5'>
           <div className='text-left flex-1'>
             <p className='text-4xl font-bold text-gray-800 mb-2 tracking-wider animate-fade-in-down'>We offer</p>
             <div className='relative inline-block my-4'>
-              <p className='text-6xl font-extrabold text-orange-600 relative z-10 transition-transform duration-300 hover:scale-105 animate-fade-in'>
+              <p className='text-6xl font-extrabold text-orange-600 relative transition-transform duration-300 hover:scale-105 animate-fade-in'>
                 Delicious Food
               </p>
               <div className='absolute inset-0 bg-orange-600 opacity-20 rounded-full scale-110 -rotate-2 transition-transform duration-300 hover:scale-125 hover:rotate-6'></div>
@@ -95,20 +160,19 @@ const UsersRestaurant = () => {
       </div>
 
       <div className="flex justify-start gap-2 my-5 px-5">
+        <button
+          className={`flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300 ${rating4PlusSelected ? '' : 'bg-yellow-500 text-white'}`}
+          onClick={() => handleFilterChange('rating', 4)}
+        >
+          <span className="mr-2"><Star /></span>
+          Ratings 4+
+        </button>
         <button className="flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300" onClick={toggleFilters}>
           <span className="mr-2"><SlidersHorizontal /></span>
           Filters
         </button>
-        <button className="flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300">
-          <span className="mr-2"><Tags /></span>
-          Offers
-        </button>
-        <button className="flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300">
-          <span className="mr-2"><Star /></span>
-          Ratings 4+
-        </button>
         <div className="relative flex-grow">
-          <input 
+          <input
             className="w-full px-3 py-2 border border-gray-300 rounded-full text-lg outline-none transition-border duration-300 focus:border-green-500 focus:shadow-outline placeholder-gray-400"
             placeholder='Search for restaurants'
             type='text'
@@ -120,87 +184,48 @@ const UsersRestaurant = () => {
       </div>
 
       {showFilters && (
-        <div className="fixed top-0 right-0 w-72 h-screen bg-white shadow-xl p-5 overflow-y-auto z-50">
-          <h3 className="text-xl font-bold mb-4">Filters</h3>
-          <div className="mb-4">
-            <h4 className="font-bold mb-2">Cuisine</h4>
-            <label className="block mb-2">
-              <input
-                type="checkbox"
-                className="mr-2"
-                checked={filters.cuisine.includes('Italian')}
-                onChange={() => handleFilterChange('cuisine', 'Italian')}
-              />
-              Italian
-            </label>
-            <label className="block mb-2">
-              <input
-                type="checkbox"
-                className="mr-2"
-                checked={filters.cuisine.includes('Chinese')}
-                onChange={() => handleFilterChange('cuisine', 'Chinese')}
-              />
-              Chinese
-            </label>
-          </div>
-          <div className="mb-4">
-            <h4 className="font-bold mb-2">Rating</h4>
-            <select
-              className="w-full p-2 border border-gray-300 rounded"
-              value={filters.rating || ''}
-              onChange={(e) => handleFilterChange('rating', e.target.value)}
-            >
-              <option value="">All Ratings</option>
-              <option value="4">4+ Stars</option>
-              <option value="3">3+ Stars</option>
-              <option value="2">2+ Stars</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <h4 className="font-bold mb-2">Price Range</h4>
-            <select
-              className="w-full p-2 border border-gray-300 rounded"
-              value={filters.priceRange || ''}
-              onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-            >
-              <option value="">All Prices</option>
-              <option value="$">2000+</option>
-              <option value="$$">3000+</option>
-              <option value="$$$">4000+</option>
-            </select>
-          </div>
-          <button className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors duration-300" onClick={applyFilters}>Apply Filters</button>
-        </div>
+        <FilterOptions
+          filters={filters}
+          handleFilterChange={handleFilterChange}
+          applyFilters={applyFilters}
+          closeFilters={closeFilters}
+        />
       )}
 
       {selectedRestaurant ? (
+        console.log(selectedRestaurant),
         <UsersRestaurantDetails restaurant={selectedRestaurant} onClose={closeDetail} />
       ) : (
-        <div className="px-5">
-          <h2 className="text-2xl font-bold mb-5">Top Restaurants</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div className="px-5 mb-10">
+          <h2 className="text-2xl font-bold mb-5">All Restaurants</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredRestaurants.map((restaurant) => (
-              <div key={restaurant.id} className="relative bg-white rounded-lg shadow-md transition-transform duration-300 hover:translate-y-1" onClick={() => handleRestaurantClick(restaurant)}>
-                <img src={restaurant.image} alt={restaurant.name} className="w-full h-48 object-cover rounded-t-lg" />
-                <div className="p-4">
-                  <h3 className="text-lg font-bold">{restaurant.name}</h3>
-                  <p className="text-gray-600">{restaurant.cuisine}</p>
-                  <div className="flex items-center mt-2">
-                    <span className="text-yellow-500">{restaurant.rating} ⭐</span>
-                    <span className="ml-2 text-gray-500">({restaurant.ratingCount} ratings)</span>
-                  </div>
-                  <p className="text-gray-600 mt-2">{restaurant.eta}</p>
-                  <FaHeart 
-                    className={`absolute top-2 right-2 text-2xl cursor-pointer transition-colors duration-300 ${likedRestaurants[restaurant.id] ? 'text-red-500' : 'text-gray-400'}`}
-                    onClick={(e) => handleLike(e, restaurant.id)}
+              <div key={restaurant.id} className="bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform transform hover:scale-105" onClick={() => handleRestaurantClick(restaurant)}>
+                <div className="relative">
+                  <img
+                    src={restaurant.image}
+                    alt={restaurant.name}
+                    className="w-full h-48 object-cover rounded-lg mb-5"
                   />
+                  <button
+                    className={`absolute top-2 right-2 p-2 rounded-full ${likedRestaurants[restaurant.id] ? 'bg-red-500 text-white' : 'bg-white text-red-500'}`}
+                    onClick={(e) => handleLike(e, restaurant.id)}
+                  >
+                    <FaHeart />
+                  </button>
                 </div>
+                <h3 className="text-xl font-bold mb-2">{restaurant.name}</h3>
+                <p className="text-gray-600 mb-2">{restaurant.cuisine}</p>
+                <p className="text-gray-600 mb-2">{'⭐'.repeat(restaurant.rating)}</p>
+                <p className="text-gray-600 mb-2">{restaurant.price}</p>
+                <p className="text-gray-600">{restaurant.location}</p>
               </div>
             ))}
           </div>
-          <Footer />
         </div>
       )}
+
+      <Footer />
     </>
   );
 };

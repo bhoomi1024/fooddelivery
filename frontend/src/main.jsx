@@ -26,6 +26,7 @@ import UsersRestaurant from "./pages/Users/usershome/UsersRestaurant.jsx"
 import Usersliked from "./pages/Users/liked/Usersliked.jsx";
 import UsersOrders from "./pages/Users/orders/Usersorders.jsx";
 import UsersDishes from "./pages/Users/Dishes/UsersDishes.jsx";
+import UsersCart from "./pages/Users/userscart/usersCart.jsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Layout />}>
@@ -40,6 +41,7 @@ const router = createBrowserRouter(
       <Route path="/Usersliked" element={<Usersliked />} />
       <Route path="/UsersOrders" element={<UsersOrders />} />
       <Route path="/UsersDishes" element={<UsersDishes />} />
+      <Route path="/UsersCart" element={<UsersCart />} />
 
       <Route path="RestaurantLayout" element={<RestaurantLayout />}>
         <Route path="ResDashBoard" element={< ResDashBoard />} />

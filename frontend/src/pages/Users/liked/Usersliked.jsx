@@ -1,39 +1,82 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
-import { FaStar, FaRegClock } from 'react-icons/fa';
+import Footer from '../../../components/HomePageCompo/Footer';
+import { Trash2 } from 'lucide-react';
+import usersRestaurantData from '../usershome/usersRestaurantdata.json'; // Ensure the JSON data is imported correctly
 
 const Usersliked = () => {
-  const likedRestaurants = [
-    { id: 1, name: "Spice Paradise", cuisine: "Indian", rating: 4.5, deliveryTime: "30-40 min", image: "https://example.com/spice-paradise.jpg" },
-    { id: 2, name: "Sushi Heaven", cuisine: "Japanese", rating: 4.7, deliveryTime: "25-35 min", image: "https://example.com/sushi-heaven.jpg" },
-    { id: 3, name: "Pasta Perfection", cuisine: "Italian", rating: 4.3, deliveryTime: "35-45 min", image: "https://example.com/pasta-perfection.jpg" },
-  ];
+  const [likedRestaurants, setLikedRestaurants] = useState({});
+  const [hoveredRestaurant, setHoveredRestaurant] = useState(null);
+
+  useEffect(() => {
+    // Load liked restaurants from local storage
+    const storedLikes = JSON.parse(localStorage.getItem('likedRestaurants')) || {};
+    setLikedRestaurants(storedLikes);
+  }, []);
+
+  const handleDelete = (restaurantId) => {
+    setLikedRestaurants(prev => {
+      const updatedLikes = { ...prev };
+      delete updatedLikes[restaurantId];
+      
+      // Save updated liked restaurants to local storage
+      localStorage.setItem('likedRestaurants', JSON.stringify(updatedLikes));
+      
+      return updatedLikes;
+    });
+  };
+
+  const handleMouseEnter = (restaurantId) => {
+    setHoveredRestaurant(restaurantId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRestaurant(null);
+  };
 
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto p-5">
-        <h1 className="text-3xl font-bold text-gray-800 mb-5 text-center">Your Most Liked Restaurants</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {likedRestaurants.map((restaurant) => (
-            <div key={restaurant.id} className="bg-white rounded-lg overflow-hidden shadow-md transform transition-transform duration-300 hover:-translate-y-1">
-              <img src={restaurant.image} alt={restaurant.name} className="w-full h-48 object-cover" />
-              <div className="p-4">
-                <h2 className="text-xl font-bold mb-2">{restaurant.name}</h2>
-                <p className="text-gray-600 mb-4">{restaurant.cuisine}</p>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="flex items-center">
-                    <FaStar className="text-yellow-500 mr-1" /> {restaurant.rating}
-                  </span>
-                  <span className="flex items-center">
-                    <FaRegClock className="text-green-500 mr-1" /> {restaurant.deliveryTime}
-                  </span>
+      <div className="px-5 mb-10">
+        <h2 className="text-2xl font-bold mb-5 pt-10">Liked Restaurants</h2>
+        {Object.keys(likedRestaurants).length === 0 ? (
+          <p>No liked restaurants yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {Object.entries(likedRestaurants).map(([id, liked]) => {
+              if (!liked) return null;
+              const restaurant = usersRestaurantData.restaurants.find(r => r.id === parseInt(id)); // Ensure ID comparison is correct
+              if (!restaurant) return null; // Add check to ensure restaurant exists
+              const isHovered = hoveredRestaurant === restaurant.id;
+
+              return (
+                <div
+                  key={restaurant.id}
+                  className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex justify-between items-center shadow-sm hover:shadow-lg relative"
+                  onMouseEnter={() => handleMouseEnter(restaurant.id)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <h3 className="text-lg text-gray-800 cursor-pointer">{restaurant.name}</h3>
+                  {isHovered && (
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 p-4 bg-white border border-gray-300 rounded-lg shadow-md z-10">
+                      <p className="text-sm text-gray-600 mb-1"><strong>Cuisine:</strong> {restaurant.cuisine}</p>
+                      <p className="text-sm text-gray-600 mb-1"><strong>Rating:</strong> {'⭐'.repeat(restaurant.rating)}</p>
+                      <p className="text-sm text-gray-600 mb-1"><strong>Rating Count:</strong> {restaurant.ratingCount}</p>
+                    </div>
+                  )}
+                  <button
+                    className="p-2 rounded-full text-black focus:outline-none"
+                    onClick={() => handleDelete(restaurant.id)}
+                  >
+                    <Trash2 />
+                  </button>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+      <Footer className="fixed bottom-0 w-full"/>
     </>
   );
 };
