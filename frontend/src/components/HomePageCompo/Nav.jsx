@@ -27,10 +27,7 @@ const Nav = () => {
                 Delivery partner
               </li>
             </Link>
-
-          {/* If restaurant is logged in then it goes to admin dashboard else it goes to login for restaurant */}
-            {/* <Link to= "/RestaurantLoginRegister"> */}
-            <Link to="RestaurantLayout">
+             <Link to= "/RestaurantLoginRegister"> 
             <li className="hover:cursor-pointer hover:scale-[0.975]">
               Restaurant login
             </li>

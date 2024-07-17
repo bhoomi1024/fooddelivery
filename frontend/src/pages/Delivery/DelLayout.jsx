@@ -1,8 +1,17 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
+import DelNav from '../../components/AfterLoginDeliveryPartnersCompo/DelNav'
+import DelSidebar from '../../components/AfterLoginDeliveryPartnersCompo/DelSideBar'
 
-function DelLayout() {
+const DelLayout = () => {
   return (
-    <div>DelLayout</div>
+    <>
+      <DelNav />
+      <div className='flex'>
+        <DelSidebar />
+        <Outlet />
+      </div>
+    </>
   )
 }
 

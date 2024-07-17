@@ -32,6 +32,17 @@ import DelResetPassword from './components/DeliveryLoginRegisterCompo/DelResetPa
 import DeliverypartnerLoginRegister from './pages/home/DeliverypartnerLoginRegister.jsx'
 import DelLayout from "./pages/Delivery/DelLayout.jsx";
 
+
+import DelDashboard from "./components/AfterLoginDeliveryPartnersCompo/DelDashboard.jsx";
+import DelEarnings from "./components/AfterLoginDeliveryPartnersCompo/DelEarnings.jsx";
+import DelNotifications from"./components/AfterLoginDeliveryPartnersCompo/DelNotifications.jsx";
+import DelOrderManagement from "./components/AfterLoginDeliveryPartnersCompo/DelOrderManagement.jsx";
+import DelProfile from "./components/AfterLoginDeliveryPartnersCompo/DelProfile.jsx";
+import DelSettings from "./components/AfterLoginDeliveryPartnersCompo/DelSettings.jsx";
+import DelSupport from "./components/AfterLoginDeliveryPartnersCompo/DelSupport.jsx";
+
+
+
 import UsersRestaurant from "./pages/Users/usershome/UsersRestaurant.jsx"
 import Usersliked from "./pages/Users/liked/Usersliked.jsx";
 import UsersOrders from "./pages/Users/orders/Usersorders.jsx";
@@ -59,7 +70,18 @@ const router = createBrowserRouter(
       <Route path="DelForgotPasswordDialog" element={<DelForgotPasswordDialog/>} />
       <Route path="DelLogin" element={<DelLogin/>} />
       <Route path="/DelResetPassword/:token" element={<DelResetPassword/>} />
-      <Route path="DelLayout" element={<DelLayout/>} />
+     
+
+      <Route path="/DelLogin" element={<DelLogin />} />
+        <Route path="/DelLayout" element={<DelLayout />}>
+          <Route path="DelDashboard" element={<DelDashboard />} />
+          <Route path="DelOrderManagement" element={<DelOrderManagement />} />
+          <Route path="DelEarnings" element={<DelEarnings />} />
+          <Route path="DelNotifications" element={<DelNotifications />} />
+          <Route path="DelProfile" element={<DelProfile />} />
+          <Route path="DelSettings" element={<DelSettings />} />
+          <Route path="DelSupport" element={<DelSupport />} />
+        </Route>
 
       <Route path="/UsersRestaurant" element={<UsersRestaurant />} />
       <Route path="/Usersliked" element={<Usersliked />} />
