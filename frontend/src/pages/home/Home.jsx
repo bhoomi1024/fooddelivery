@@ -33,7 +33,7 @@ const Home = () => {
           {" "}
           {/* grid column 2 containing image*/}
           <img
-            className="ml-20 mt-9 h-[460px] w-[485px] rounded-full"
+            className="ml-20 mt-9 h-[460px] w-[485px] rounded-full shadow-lg"
             src={logo}
             alt="food delivery"
           />

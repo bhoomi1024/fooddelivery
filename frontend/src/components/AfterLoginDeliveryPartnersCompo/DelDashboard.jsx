@@ -5,10 +5,10 @@ import UserImage from '../../assets/graph.jpeg'; // Ensure the path is correct
 const DelDashboard = () => {
   return (
     <div className="bg-gradient-to-r from-white via-yellow-100 to-white ml-60 mt-[78px] w-full font-poppins p-4 h-screen flex">
-      <div className="w-2/3">
-        <Typography variant="h4" className="text-yellow-500 font-bold text-center mb-8">
-          Dashboard
-        </Typography>
+      <div >
+        <h2 className='flex justify-center text-2xl my-4 font-semibold'>
+          DashBoard
+        </h2>
 
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} sm={6} md={6}>
