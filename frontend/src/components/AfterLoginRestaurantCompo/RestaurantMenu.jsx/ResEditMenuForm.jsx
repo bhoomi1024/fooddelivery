@@ -1,16 +1,34 @@
-// src/components/Modal.js
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useSpring, animated } from '@react-spring/web';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
 
-const ResEditMenuForm = ({ show, handleClose, props }) => {
+const ResEditMenuForm = ({ show, handleClose }) => {
+    const { id } = useParams(); // Ensure this matches the route parameter name
     const [image, setImage] = useState(null);
     const [dishName, setDishName] = useState("");
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState("");
-    const [cuisineName, setcuisineName] = useState("");
+    const [cuisineName, setCuisineName] = useState("");
+    const navigate = useNavigate();
 
-    // Define the spring animation for the modal
+    useEffect(() => {
+        if (id) {
+            axios.get(`http://localhost:3000/api/menu/ResMenu/${id}`)
+                .then(result => {
+                    const { dishName, price, description, cuisineName, image } = result.data;
+                    setDishName(dishName);
+                    setPrice(price);
+                    setDescription(description);
+                    setCuisineName(cuisineName);
+                    setImage(image);
+                })
+                .catch(err => console.log(err));
+        }
+    }, [id]);
+
     const animation = useSpring({
         opacity: show ? 1 : 0,
         transform: show ? 'translateY(0%)' : 'translateY(-50%)',
@@ -18,20 +36,31 @@ const ResEditMenuForm = ({ show, handleClose, props }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (!id) {
+            toast.error("Item ID is not available!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('dishName', dishName);
+        formData.append('price', price);
+        formData.append('description', description);
+        formData.append('cuisineName', cuisineName);
+        if (image) formData.append('image', image);
+
         try {
-            const response = await fetch("https://your-api-url", {
-                method: "PATCH",
+            const response = await axios.patch(`http://localhost:3000/api/menu/ResMenu/${id}`, formData, {
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'multipart/form-data',
                 },
-                body: JSON.stringify({ image, dishName, price, description, cuisineName }),
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error("Item could not be edited!");
             }
-            // toast.success("Item successfully!");
-            console.log({ image, dishName, price, description });
+            toast.success("Item successfully edited!");
+            handleClose();
+            navigate('/menu');
         } catch (error) {
             toast.error("Item could not be edited!");
             handleClose();
@@ -55,62 +84,56 @@ const ResEditMenuForm = ({ show, handleClose, props }) => {
                                         name="name"
                                         id="name"
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-
                                         value={dishName}
-                                        onChange={(e) => {
-                                            setDishName(e.target.value)
-                                        }}
-                                        required />
+                                        onChange={(e) => setDishName(e.target.value)}
+                                        required
+                                    />
                                 </div>
                                 <div>
                                     <label htmlFor="price" className="block mb-1 text-sm font-medium text-gray-900">Price</label>
                                     <input
                                         type="number"
-                                        name="price" id="price"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Set Price"
+                                        name="price"
+                                        id="price"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         value={price}
-                                        onChange={(e) => {
-                                            setPrice(e.target.value)
-                                        }}
-                                        required />
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        required
+                                    />
                                 </div>
                             </div>
                             <div className='mb-2'>
                                 <label htmlFor="cuisine" className="block mb-1 text-sm font-medium text-gray-900">Cuisine Type</label>
                                 <input
                                     type="text"
-                                    name="cuisine" 
+                                    name="cuisine"
                                     id="cuisine"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter"
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                     value={cuisineName}
-                                    onChange={(e) => {
-                                        setcuisineName(e.target.value)
-                                    }}
-                                    required />
+                                    onChange={(e) => setCuisineName(e.target.value)}
+                                    required
+                                />
                             </div>
                             <div className='mb-2'>
-                                <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Product Description</label>
+                                <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-900">Product Description</label>
                                 <textarea
                                     id="description"
                                     rows="4"
                                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="Write product description here"
                                     value={description}
-                                    onChange={(e) => {
-                                        setDescription(e.target.value)
-                                    }} />
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Write product description here"
+                                />
                             </div>
                             <div>
-                                <label htmlFor="name" className="block mb-1 text-sm font-medium text-gray-900">Item Image</label>
+                                <label htmlFor="image" className="block mb-1 text-sm font-medium text-gray-900">Item Image</label>
                                 <input
                                     type="file"
                                     name="image"
-                                    id="img"
+                                    id="image"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                    required
-                                    onChange={(e) => {
-                                        setImage(e.target.value)
-                                    }} />
+                                    onChange={(e) => setImage(e.target.files[0])}
+                                />
                             </div>
                             <div className='flex gap-x-3'>
                                 <button
