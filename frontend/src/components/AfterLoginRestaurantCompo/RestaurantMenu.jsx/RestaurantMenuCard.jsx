@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ResEditDelMenuDialog from './ResEditDelMenuDialog';
 import toast from 'react-hot-toast';
-
 
 const RestaurantMenuCard = (props) => {
     const [inStock, setInStock] = useState(props.inStock);
@@ -22,26 +21,25 @@ const RestaurantMenuCard = (props) => {
 
     // After InStock Toggle fetch request to backend to update the stock
     const handleInStockChange = async () => {
-        setInStock(!inStock);
         try {
-            const response = await fetch("https://your-api-url", {
+            const response = await fetch(`http://localhost:3000/api/menu/toggleStock/${props.cardId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ inStock }),
+                body: JSON.stringify({ inStock: !inStock }),
             });
 
             if (!response.ok) {
-                throw new Error("Could not update !!");
+                throw new Error("Could not update!!");
             }
-            toast.success("Updated Stock successfully!");
 
+            setInStock(!inStock);
+            toast.success("Updated Stock successfully!");
         } catch (error) {
             toast.error("Could not update Stock!");
         }
     }
-
 
     useEffect(() => {
         if (isDialogOpen) {
@@ -49,7 +47,7 @@ const RestaurantMenuCard = (props) => {
         } else {
             document.removeEventListener('mousedown', handleClickOutside);
         }
-        // to unmount the event listener 
+        // Unmount the event listener 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -58,8 +56,8 @@ const RestaurantMenuCard = (props) => {
     return (
         <>
             <div className='flex items-center my-8 mx-24 border border-neutral-300 bg-white rounded-xl'>
-                <div className='flex justify-center items-center h-44 w-44 '>
-                    <img src={props.src} alt="food image" className='h-[70%] w-[70%] object-cover size-60 ' />
+                <div className='flex justify-center items-center h-44 w-44'>
+                    <img src={props.src} alt="food image" className='h-[70%] w-[70%] object-cover size-60' />
                 </div>
                 <div className='flex flex-col gap-y-3 ml-5 py-4 w-[700px]'>
                     <div className='flex justify-between items-center max-w-[680px]'>
@@ -73,11 +71,12 @@ const RestaurantMenuCard = (props) => {
                         </div>
                         <div className='flex gap-x-3'>
                             <label className="inline-flex items-center cursor-pointer">
-                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-3">{inStock ? `In Stock` : `Out of Stock`}</span>
-                                <input type="checkbox" checked={inStock} value="" className="sr-only peer "
-                                    onClick={(handleInStockChange)} />
-                                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-
+                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300 mr-3">
+                                    {inStock ? 'In Stock' : 'Out of Stock'}
+                                </span>
+                                <input type="checkbox" checked={inStock} className="sr-only peer"
+                                    onChange={handleInStockChange} />
+                                <div className="relative w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
                             </label>
                             <div className='flex relative'>
                                 <button className='hover:bg-neutral-200 hover:rounded-full p-2'
@@ -87,7 +86,9 @@ const RestaurantMenuCard = (props) => {
                                 </button>
                                 {isDialogOpen && (
                                     <ResEditDelMenuDialog
-                                        ref={dialogRef} id ={props.cardId}/>
+                                        ref={dialogRef}
+                                        id={props.cardId}
+                                    />
                                 )}
                             </div>
                         </div>
@@ -101,7 +102,6 @@ const RestaurantMenuCard = (props) => {
                         <p className='text-lg font-semibold'>
                             {props.price}
                         </p>
-                        
                     </div>
                 </div>
             </div>
@@ -109,4 +109,4 @@ const RestaurantMenuCard = (props) => {
     )
 }
 
-export default RestaurantMenuCard
+export default RestaurantMenuCard;
