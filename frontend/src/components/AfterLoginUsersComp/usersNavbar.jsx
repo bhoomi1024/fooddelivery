@@ -37,9 +37,7 @@ const Navbar = ({ cartCount, likedCount }) => {
           <div className="hidden md:block mr-8">
             <div className="ml-4 flex items-center md:ml-6">
             <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link to="/UsersDishes" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Menu</Link>
-            </div>
+           
           </div>
           <Link to="/UsersCart">
               <button className="ml-3 p-1 relative">
