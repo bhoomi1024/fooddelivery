@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ResEditDelMenuDialog from './ResEditDelMenuDialog';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const RestaurantMenuCard = (props) => {
     const [inStock, setInStock] = useState(props.inStock);
@@ -21,6 +22,8 @@ const RestaurantMenuCard = (props) => {
 
     // After InStock Toggle fetch request to backend to update the stock
     const handleInStockChange = async () => {
+        setInStock(!inStock); // Optimistically update UI
+
         try {
             const response = await fetch(`http://localhost:3000/api/menu/toggleStock/${props.cardId}`, {
                 method: "PATCH",
@@ -34,9 +37,10 @@ const RestaurantMenuCard = (props) => {
                 throw new Error("Could not update!!");
             }
 
-            setInStock(!inStock);
             toast.success("Updated Stock successfully!");
         } catch (error) {
+            console.error(error);
+            setInStock(!inStock); // Revert the optimistic update
             toast.error("Could not update Stock!");
         }
     }

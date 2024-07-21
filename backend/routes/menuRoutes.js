@@ -48,13 +48,13 @@ router.get('/ResMenu', async (req, res) => {
 // Route to update a menu item by ID
 router.patch('/ResMenu/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
-  const { dishName, price, description, cuisineName, inStock } = req.body;
+  console.log(id);
+  const { dishName, price, description, cuisineName } = req.body;
   const updateData = {
     dishName,
     price,
     description,
     cuisineName,
-    inStock,
   };
 
   if (req.file) {
@@ -93,5 +93,53 @@ router.get('/ResMenu/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch menu item' });
   }
 });
+
+// Route to delete a menu Item
+router.delete('/DeleteMenu/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const menuItem = await MenuItemModel.findByIdAndDelete(id);
+
+    if (!menuItem) {
+      return res.status(404).json({ error: 'Menu item not deleted' });
+    }
+    return res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to delete menu item' });
+  }
+}
+)
+
+// Route to toggle inStock
+router.patch('/toggleStock/:id', async (req, res) => {
+  const { id } = req.params;
+  const { inStock } = req.body;
+
+  // Log the received parameters for debugging purposes
+  console.log(id, inStock);
+
+  // Validate inStock is a boolean
+  if (typeof inStock !== 'boolean') {
+    return res.status(400).json({ error: 'Invalid value for inStock. It must be a boolean.' });
+  }
+
+  try {
+    const menuItem = await MenuItemModel.findByIdAndUpdate(id, { inStock }, { new: true });
+
+    // Log the updated menu item for debugging purposes
+    console.log(menuItem);
+
+    if (!menuItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    return res.status(200).json({ message: 'Stock updated successfully' });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error(error);
+    return res.status(500).json({ error: 'Failed to update stock' });
+  }
+});
+
 
 export default router;

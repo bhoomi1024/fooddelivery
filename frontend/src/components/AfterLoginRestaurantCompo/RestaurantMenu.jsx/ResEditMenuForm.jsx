@@ -5,8 +5,9 @@ import { useSpring, animated } from '@react-spring/web';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const ResEditMenuForm = ({ show, handleClose }) => {
-    const { id } = useParams(); // Ensure this matches the route parameter name
+const ResEditMenuForm = ({ show, handleClose,editId }) => {
+    // const { id } = useParams(); // Ensure this matches the route parameter name
+    const [loadData,setLoadData] = useState(true);
     const [image, setImage] = useState(null);
     const [dishName, setDishName] = useState("");
     const [price, setPrice] = useState(0);
@@ -15,19 +16,22 @@ const ResEditMenuForm = ({ show, handleClose }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (id) {
-            axios.get(`http://localhost:3000/api/menu/ResMenu/${id}`)
-                .then(result => {
-                    const { dishName, price, description, cuisineName, image } = result.data;
-                    setDishName(dishName);
-                    setPrice(price);
-                    setDescription(description);
-                    setCuisineName(cuisineName);
-                    setImage(image);
-                })
-                .catch(err => console.log(err));
-        }
-    }, [id]);
+        
+           if(loadData){
+            axios.get(`http://localhost:3000/api/menu/ResMenu/${editId}`)
+            .then(result => {
+                const { dishName, price, description, cuisineName, image } = result.data;
+                setDishName(dishName);
+                setPrice(price);
+                setDescription(description);
+                setCuisineName(cuisineName);
+                setImage(image);
+                setLoadData(false);
+            })
+            .catch(err => console.log(err));
+    
+           }
+    }, [loadData]);
 
     const animation = useSpring({
         opacity: show ? 1 : 0,
@@ -36,10 +40,6 @@ const ResEditMenuForm = ({ show, handleClose }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!id) {
-            toast.error("Item ID is not available!");
-            return;
-        }
 
         const formData = new FormData();
         formData.append('dishName', dishName);
@@ -49,7 +49,7 @@ const ResEditMenuForm = ({ show, handleClose }) => {
         if (image) formData.append('image', image);
 
         try {
-            const response = await axios.patch(`http://localhost:3000/api/menu/ResMenu/${id}`, formData, {
+            const response = await axios.patch(`http://localhost:3000/api/menu/ResMenu/${editId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -60,7 +60,7 @@ const ResEditMenuForm = ({ show, handleClose }) => {
             }
             toast.success("Item successfully edited!");
             handleClose();
-            navigate('/menu');
+            navigate(0);
         } catch (error) {
             toast.error("Item could not be edited!");
             handleClose();

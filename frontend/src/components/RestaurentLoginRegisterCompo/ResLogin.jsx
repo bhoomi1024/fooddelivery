@@ -39,7 +39,7 @@ const ResLogin = () => {
 
       if (response.data.status) {
         console.log("Login successful, navigating to /RestaurantLayout");
-        navigate("/RestaurantLayout"); // Navigate to the after login page upon successful login
+        navigate("/RestaurantLayout/ResDashBoard"); // Navigate to the after login page upon successful login
       } else {
         setError(response.data.message || "Login failed"); // Set error state if login failed
       }

@@ -30,10 +30,10 @@ const ResEditDelMenuDialog = forwardRef((props, dialogRef) => {
 
                     </li>
                 </ul>
-                <DeleteDialog id={props.id} show={delDialog} handleClose={() => {
+                <DeleteDialog delId={props.id} show={delDialog} handleClose={() => {
                     setDelDialog(false);
                 }} />
-                <ResEditMenuForm id={props.id} show={editDialog} handleClose={() => {
+                <ResEditMenuForm editId={props.id} show={editDialog} handleClose={() => {
                     setEditDialog(false);
                 }} />
             </div>
