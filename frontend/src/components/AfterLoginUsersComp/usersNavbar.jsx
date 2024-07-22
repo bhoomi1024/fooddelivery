@@ -93,6 +93,7 @@ const Navbar = ({ cartCount, likedCount }) => {
           {/* Right side - Search, Cart, Likes, Profile */}
           <div className="hidden md:block mr-8">
             <div className="ml-4 flex items-center md:ml-6">
+<<<<<<< HEAD
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
                   <Link to="/UsersDishes" className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Menu</Link>
@@ -107,6 +108,20 @@ const Navbar = ({ cartCount, likedCount }) => {
                     </span>
                   )}
                 </button>
+=======
+            <div className="hidden md:block">
+           
+          </div>
+          <Link to="/UsersCart">
+              <button className="ml-3 p-1 relative">
+                <ShoppingCart className="h-6 w-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+>>>>>>> 665575f740960d3d39c39f8c5b6e8db9269aa89d
               </Link>
               <Link to="/Usersliked">
                 <button className="ml-3 p-1 relative">

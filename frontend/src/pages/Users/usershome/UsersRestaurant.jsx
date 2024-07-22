@@ -217,8 +217,7 @@ const UsersRestaurant = () => {
                 <h3 className="text-xl font-bold mb-2">{restaurant.name}</h3>
                 <p className="text-gray-600 mb-2">{restaurant.cuisine}</p>
                 <p className="text-gray-600 mb-2">{'⭐'.repeat(restaurant.rating)}</p>
-                <p className="text-gray-600 mb-2">{restaurant.price}</p>
-                <p className="text-gray-600">{restaurant.location}</p>
+                
               </div>
             ))}
           </div>

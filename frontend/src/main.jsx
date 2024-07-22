@@ -45,8 +45,7 @@ import DelSupport from "./components/AfterLoginDeliveryPartnersCompo/DelSupport.
 
 import UsersRestaurant from "./pages/Users/usershome/UsersRestaurant.jsx"
 import Usersliked from "./pages/Users/liked/Usersliked.jsx";
-import UsersOrders from "./pages/Users/orders/Usersorders.jsx";
-import UsersDishes from "./pages/Users/Dishes/UsersDishes.jsx";
+import Usersorders from "./pages/Users/usersOrders/Usersorders.jsx";
 import UsersCart from "./pages/Users/userscart/usersCart.jsx";
 import ResOrders from "./pages/restaurant/ResOrders.jsx";
 const router = createBrowserRouter(
@@ -85,8 +84,7 @@ const router = createBrowserRouter(
 
       <Route path="/UsersRestaurant" element={<UsersRestaurant />} />
       <Route path="/Usersliked" element={<Usersliked />} />
-      <Route path="/UsersOrders" element={<UsersOrders />} />
-      <Route path="/UsersDishes" element={<UsersDishes />} />
+      <Route path="/UsersOrders" element={<Usersorders />} />
       <Route path="/UsersCart" element={<UsersCart />} />
 
 
