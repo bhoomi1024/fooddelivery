@@ -28,7 +28,7 @@ router.post('/ResMenu', Authenticate,upload.single('image'), async (req, res) =>
       description,
       cuisineName,
       image: cloudinaryResponse.url,
-      ownerId: req.userId 
+      ownerId: req.ResUserId
     });
 
     fs.unlinkSync(localFilePath); // Remove the local file after uploading to Cloudinary
@@ -42,7 +42,9 @@ router.post('/ResMenu', Authenticate,upload.single('image'), async (req, res) =>
 // Route to get all menu items
 router.get('/ResMenu', Authenticate,async (req, res) => {
   try {
-    const menuItems = await MenuItemModel.find();
+    const menuItems = await MenuItemModel.find({
+      ownerId: req.ResUserId
+    });
     res.status(200).json(menuItems);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch menu items' });

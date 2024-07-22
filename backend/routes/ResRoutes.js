@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from 'nodemailer';
-import RestaurentModel from "../models/ResModel.js";
+import RestaurantModel from "../models/ResModel.js";
 
 const router = express.Router();
 
@@ -11,14 +11,14 @@ router.post('/res/register', async (req, res) => {
   const { ownerName, password, restaurantName, phone, email, city, address, countryName, stateName } = req.body;
 
   try {
-    let user = await RestaurentModel.findOne({ email });
+    let user = await RestaurantModel.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = new RestaurentModel({
+    user = new RestaurantModel({
       ownerName,
       password: hashedPassword,
       restaurantName,
@@ -43,7 +43,7 @@ router.post('/ResLogin', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await RestaurentModel.findOne({ email });
+    const user = await RestaurantModel.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User is not registered" });
     }
@@ -68,7 +68,7 @@ router.post('/ResForgotPasswordDialog', async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await RestaurentModel.findOne({ email });
+    const user = await RestaurantModel.findOne({ email });
     if (!user) {
       return res.json({ message: "User not registered" });
     }
@@ -98,7 +98,7 @@ http://localhost:5173/ResResetPassword/${token}
 Thank you for being a part of the FoodieBuddy community!
 
 Best regards,
-The FoodieBuddy Restaurent Partners Team`
+The FoodieBuddy Restaurant Partners Team`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -126,7 +126,7 @@ router.post('/ResResetPassword/:token', async (req, res) => {
     const id = decoded.id;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await RestaurentModel.findOneAndUpdate({ _id: id }, { password: hashedPassword });
+    await RestaurantModel.findOneAndUpdate({ _id: id }, { password: hashedPassword });
 
     return res.json({ status: 'success', message: 'Password updated' });
   } catch (err) {
@@ -144,7 +144,7 @@ export const Authenticate = async (req, res, next) => {
     }
     
     const verifyToken = jwt.verify(token, process.env.KEY);
-    const rootResUser = await RestaurentModel.findOne({ _id: verifyToken.id });
+    const rootResUser = await RestaurantModel.findOne({ _id: verifyToken.id });
     
     if (!rootResUser) {
       return res.status(401).json({ message: 'Unauthorized: User not found' });

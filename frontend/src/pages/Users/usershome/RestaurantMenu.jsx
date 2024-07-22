@@ -28,6 +28,7 @@ const RestaurantMenu = ({ menuItems, loading, error }) => {
               <p className="text-lg font-semibold text-yellow-600">Rs {item.price.toFixed(2)}</p>
               {item.inStock ? (
                 <AddToCartButton item={item} />
+                
               ) : (
                 <p className="text-red-600 font-semibold">Not Available</p>
               )}

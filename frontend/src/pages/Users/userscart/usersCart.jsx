@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
+import { useSelector } from 'react-redux';
 
 const UsersCart = () => {
   const [promoCode, setPromoCode] = useState('');
 
   // Sample cart items (replace with actual data)
-  const cartItems = [
-    { id: 1, title: 'Item 1', price: 10, quantity: 2 },
-    { id: 2, title: 'Item 2', price: 15, quantity: 1 },
-    { id: 3, title: 'Item 3', price: 20, quantity: 3 },
-  ];
+  const cartItems = useSelector(state => state.cart.cart) 
 
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
@@ -18,8 +15,6 @@ const UsersCart = () => {
     // Implement remove item logic
   
   };
-
- 
 
   return (
     <>

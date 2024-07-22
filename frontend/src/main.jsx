@@ -35,7 +35,7 @@ import DelLayout from "./pages/Delivery/DelLayout.jsx";
 
 import DelDashboard from "./components/AfterLoginDeliveryPartnersCompo/DelDashboard.jsx";
 import DelEarnings from "./components/AfterLoginDeliveryPartnersCompo/DelEarnings.jsx";
-import DelNotifications from"./components/AfterLoginDeliveryPartnersCompo/DelNotifications.jsx";
+import DelNotifications from "./components/AfterLoginDeliveryPartnersCompo/DelNotifications.jsx";
 import DelOrderManagement from "./components/AfterLoginDeliveryPartnersCompo/DelOrderManagement.jsx";
 import DelProfile from "./components/AfterLoginDeliveryPartnersCompo/DelProfile.jsx";
 import DelSettings from "./components/AfterLoginDeliveryPartnersCompo/DelSettings.jsx";
@@ -48,6 +48,10 @@ import Usersliked from "./pages/Users/liked/Usersliked.jsx";
 import Usersorders from "./pages/Users/usersOrders/Usersorders.jsx";
 import UsersCart from "./pages/Users/userscart/usersCart.jsx";
 import ResOrders from "./pages/restaurant/ResOrders.jsx";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "./redux/store.js";
+
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Layout />}>
@@ -59,28 +63,28 @@ const router = createBrowserRouter(
       <Route path="/ResResetPassword/:token" element={<ResResetPassword />} />
 
 
-      <Route path="UserLoginRegister" element={<UserLoginRegister/>} />
-      <Route path="UserForgotPasswordDialog" element={<UserForgotPasswordDialog/>} />
-      <Route path="UserLogin" element={<UserLogin/>} />
-      <Route path="/UserResetPassword/:token" element={<UserResetPassword/>} />
+      <Route path="UserLoginRegister" element={<UserLoginRegister />} />
+      <Route path="UserForgotPasswordDialog" element={<UserForgotPasswordDialog />} />
+      <Route path="UserLogin" element={<UserLogin />} />
+      <Route path="/UserResetPassword/:token" element={<UserResetPassword />} />
 
 
-      <Route path="DeliverypartnerLoginRegister" element={<DeliverypartnerLoginRegister/>} />
-      <Route path="DelForgotPasswordDialog" element={<DelForgotPasswordDialog/>} />
-      <Route path="DelLogin" element={<DelLogin/>} />
-      <Route path="/DelResetPassword/:token" element={<DelResetPassword/>} />
-     
+      <Route path="DeliverypartnerLoginRegister" element={<DeliverypartnerLoginRegister />} />
+      <Route path="DelForgotPasswordDialog" element={<DelForgotPasswordDialog />} />
+      <Route path="DelLogin" element={<DelLogin />} />
+      <Route path="/DelResetPassword/:token" element={<DelResetPassword />} />
+
 
       <Route path="/DelLogin" element={<DelLogin />} />
-        <Route path="/DelLayout" element={<DelLayout />}>
-          <Route path="DelDashboard" element={<DelDashboard />} />
-          <Route path="DelOrderManagement" element={<DelOrderManagement />} />
-          <Route path="DelEarnings" element={<DelEarnings />} />
-          <Route path="DelNotifications" element={<DelNotifications />} />
-          <Route path="DelProfile" element={<DelProfile />} />
-          <Route path="DelSettings" element={<DelSettings />} />
-          <Route path="DelSupport" element={<DelSupport />} />
-        </Route>
+      <Route path="/DelLayout" element={<DelLayout />}>
+        <Route path="DelDashboard" element={<DelDashboard />} />
+        <Route path="DelOrderManagement" element={<DelOrderManagement />} />
+        <Route path="DelEarnings" element={<DelEarnings />} />
+        <Route path="DelNotifications" element={<DelNotifications />} />
+        <Route path="DelProfile" element={<DelProfile />} />
+        <Route path="DelSettings" element={<DelSettings />} />
+        <Route path="DelSupport" element={<DelSupport />} />
+      </Route>
 
       <Route path="/UsersRestaurant" element={<UsersRestaurant />} />
       <Route path="/Usersliked" element={<Usersliked />} />
@@ -91,7 +95,7 @@ const router = createBrowserRouter(
 
       <Route path="RestaurantLayout" element={<RestaurantLayout />}>
         <Route path="ResDashBoard" element={< ResDashBoard />} />
-        <Route path="ResOrders" element={<ResOrders/>} />
+        <Route path="ResOrders" element={<ResOrders />} />
         <Route path="ResDetails" element={<ResDetails />} />
         <Route path="ResMenu" element={< ResMenu />} />
       </Route>
@@ -102,7 +106,9 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
-    <Toaster position="bottom-right"/>
+    <ReduxProvider store={store}>
+      <RouterProvider router={router} />
+      <Toaster position="bottom-right" />
+    </ReduxProvider>
   </React.StrictMode>
 );

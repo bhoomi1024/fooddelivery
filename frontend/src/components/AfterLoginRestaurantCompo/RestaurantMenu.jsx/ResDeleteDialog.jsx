@@ -18,6 +18,7 @@ console.log(delId);
         try {
             const response = await fetch(`http://localhost:3000/api/menu/DeleteMenu/${delId}`, {
                 method: "DELETE",
+                credentials: 'include'
             });
             console.log(response);
             if (!response.ok) {

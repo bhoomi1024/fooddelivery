@@ -72,7 +72,7 @@ const Modal = ({ show, handleClose, addMenuItem }) => {
         },
         withCredentials: true
       });
-
+      console.log(response);
       if (response.status !== 200) {
         throw new Error("Item could not be added!");
       }

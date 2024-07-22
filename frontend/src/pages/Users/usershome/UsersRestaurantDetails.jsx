@@ -17,7 +17,7 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
     try {
       setLoading(true);
       const response = await axios.get('http://localhost:3000/api/menu/ResMenu');
-      
+      console.log(response);
       if (Array.isArray(response.data)) {
         setMenuItems(response.data);
       } else if (response.data && Array.isArray(response.data.menu)) {

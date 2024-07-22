@@ -1,29 +1,37 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import {useDispatch, useSelector} from 'react-redux'
+import { addToCart, decrementQuantity, incrementQuantity } from '../../../redux/slices/cartSlice';
+
 
 const AddToCartButton = ({ item, initialQuantity = 0 }) => {
   const [quantity, setQuantity] = useState(initialQuantity);
   const [isHovered, setIsHovered] = useState(false);
 
-  const addToCart = () => {
+  const dispatch = useDispatch();
+
+  // const quantity = useSelector(state => state.cart) 
+
+  const handleAddToCart = () => {
     setQuantity(prevQuantity => prevQuantity + 1);
+    dispatch(addToCart(item))
     toast.success(`${item.dishName} added to cart!`);
   };
 
-  const removeFromCart = () => {
-    setQuantity(prevQuantity => {
-      if (prevQuantity > 0) {
-        toast.warn(`1 ${item.dishName} removed from cart.`);
-        return prevQuantity - 1;
-      }
-      return prevQuantity;
-    });
-  };
 
+  const increaseItem = () => {
+    dispatch(incrementQuantity(item._id));
+    }
+
+    const decreaseItem = () => {
+      dispatch(decrementQuantity(item._id));
+    }
+
+ 
   if (quantity === 0) {
     return (
       <button
-        onClick={addToCart}
+        onClick={handleAddToCart}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`
@@ -56,7 +64,7 @@ const AddToCartButton = ({ item, initialQuantity = 0 }) => {
   return (
     <div className="flex items-center bg-white rounded-full overflow-hidden shadow-md border border-gray-200">
       <button
-        onClick={removeFromCart}
+        onClick={decreaseItem}
         className="px-3 py-2 text-red-500 hover:text-red-600 transition-colors duration-300 focus:outline-none"
       >
         <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,7 +73,7 @@ const AddToCartButton = ({ item, initialQuantity = 0 }) => {
       </button>
       <p className="px-3 py-2 font-semibold text-gray-800">{quantity}</p>
       <button
-        onClick={addToCart}
+        onClick={increaseItem}
         className="px-3 py-2 text-green-500 hover:text-green-600 transition-colors duration-300 focus:outline-none"
       >
         <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
