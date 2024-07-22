@@ -3,16 +3,19 @@ import express from 'express';
 import { upload } from '../middleware/multer.middleware.js';
 import MenuItemModel from '../models/MenuModel.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import {Authenticate} from '../routes/ResRoutes.js'
 import fs from 'fs';
+
 
 const router = express.Router();
 
 // Route to create a new menu item
-router.post('/ResMenu', upload.single('image'), async (req, res) => {
+router.post('/ResMenu', Authenticate,upload.single('image'), async (req, res) => {
   try {
     const { dishName, price, description, cuisineName } = req.body;
     const localFilePath = req.file.path;
-
+    console.log("Request body:", req.body);
+    console.log("Request file:", req.file);
     const cloudinaryResponse = await uploadOnCloudinary(localFilePath);
 
     if (!cloudinaryResponse) {
@@ -25,6 +28,7 @@ router.post('/ResMenu', upload.single('image'), async (req, res) => {
       description,
       cuisineName,
       image: cloudinaryResponse.url,
+      ownerId: req.userId 
     });
 
     fs.unlinkSync(localFilePath); // Remove the local file after uploading to Cloudinary
@@ -36,7 +40,7 @@ router.post('/ResMenu', upload.single('image'), async (req, res) => {
 });
 
 // Route to get all menu items
-router.get('/ResMenu', async (req, res) => {
+router.get('/ResMenu', Authenticate,async (req, res) => {
   try {
     const menuItems = await MenuItemModel.find();
     res.status(200).json(menuItems);
@@ -46,7 +50,7 @@ router.get('/ResMenu', async (req, res) => {
 });
 
 // Route to update a menu item by ID
-router.patch('/ResMenu/:id', upload.single('image'), async (req, res) => {
+router.patch('/ResMenu/:id',Authenticate ,upload.single('image'), async (req, res) => {
   const { id } = req.params;
   console.log(id);
   const { dishName, price, description, cuisineName } = req.body;
@@ -81,7 +85,7 @@ router.patch('/ResMenu/:id', upload.single('image'), async (req, res) => {
 });
 
 // Route to get a menu item by ID
-router.get('/ResMenu/:id', async (req, res) => {
+router.get('/ResMenu/:id',Authenticate ,async (req, res) => {
   try {
     const { id } = req.params;
     const menuItem = await MenuItemModel.findById(id);
@@ -95,7 +99,7 @@ router.get('/ResMenu/:id', async (req, res) => {
 });
 
 // Route to delete a menu Item
-router.delete('/DeleteMenu/:id', async (req, res) => {
+router.delete('/DeleteMenu/:id', Authenticate,async (req, res) => {
   try {
     const { id } = req.params;
     const menuItem = await MenuItemModel.findByIdAndDelete(id);
@@ -111,7 +115,7 @@ router.delete('/DeleteMenu/:id', async (req, res) => {
 )
 
 // Route to toggle inStock
-router.patch('/toggleStock/:id', async (req, res) => {
+router.patch('/toggleStock/:id', Authenticate,async (req, res) => {
   const { id } = req.params;
   const { inStock } = req.body;
 
@@ -141,5 +145,12 @@ router.patch('/toggleStock/:id', async (req, res) => {
   }
 });
 
-
+router.get('/ResMenu', Authenticate, async (req, res) => {
+  try {
+    const menuItems = await MenuItemModel.find({ ownerId: req.userId }); // Retrieve menus specific to the logged in user
+    res.status(200).json(menuItems);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch menu items' });
+  }
+});
 export default router;

@@ -136,25 +136,62 @@ router.post('/ResResetPassword/:token', async (req, res) => {
 });
 
 // Middleware to Verify User
-const verifyUser = async (req, res, next) => {
+export const Authenticate = async (req, res, next) => {
   try {
-    const token = req.cookies.token; // Use cookies to get token
+    const token = req.cookies.token; // Retrieve token from cookies
     if (!token) {
-      return res.json({ status: false, message: 'Invalid Token' });
+      return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
-
-    const decoded = jwt.verify(token, process.env.KEY);
-    req.user = decoded; // Attach user info to request object
+    
+    const verifyToken = jwt.verify(token, process.env.KEY);
+    const rootResUser = await RestaurentModel.findOne({ _id: verifyToken.id });
+    
+    if (!rootResUser) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+    
+    req.token = token;
+    req.rootResUser = rootResUser;
+    req.ResUserId = rootResUser._id;
     next();
   } catch (err) {
-    console.error(err);
-    return res.json({ status: false, message: 'Invalid Token' });
+    console.log(err);
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
-};
+}
 
 // Verify Endpoint
-router.get("/verify", verifyUser, (req, res) => {
-  return res.json({ status: true, message: 'Authorized' });
+
+
+router.get('/logout',(req,res)=>{
+  res.clearCookie('token')
+  return res.json({status: true})
+})
+
+//Dashboard
+router.get('/RestaurantLayout/ResDashBoard', Authenticate, (req, res) => {
+  res.json(req.rootResUser); // Send the user data as JSON
 });
+//Details
+router.get('/RestaurantLayout/ResDetails', Authenticate, (req, res) => {
+  res.json(req.rootResUser); 
+});
+router.patch('/updateDetails/:restaurantId', async (req, res) => {
+  try {
+      const { restaurantId } = req.params;
+      
+      if (!restaurantId) {
+          return res.status(400).json({ error: 'Restaurant ID is required' });
+      }
+      
+      
+
+      res.status(200).json({ message: 'Details updated successfully' });
+  } catch (error) {
+      console.error('Error updating details:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 export default router;

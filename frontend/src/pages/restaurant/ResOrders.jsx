@@ -1,5 +1,6 @@
 import React from 'react'
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const ResOrders = () => {
     return (
         <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins'>

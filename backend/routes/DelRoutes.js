@@ -138,25 +138,58 @@ router.post('/DelResetPassword/:token', async (req, res) => {
 });
 
 // Middleware to Verify User
-const verifyUser = async (req, res, next) => {
+export const AuthenticateDel = async (req, res, next) => {
   try {
-    const token = req.cookies.token; // Use cookies to get token
+    const token = req.cookies.token; // Retrieve token from cookies
     if (!token) {
-      return res.json({ status: false, message: 'Invalid Token' });
+      return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
-
-    const decoded = jwt.verify(token, process.env.KEY);
-    req.user = decoded; // Attach user info to request object
+    
+    const verifyToken = jwt.verify(token, process.env.KEY);
+    const rootDel = await DeliveryModel.findOne({ _id: verifyToken.id });
+    
+    if (!rootDel) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+    
+    req.token = token;
+    req.rootDel = rootDel;
+    req.DelId = rootDel._id;
     next();
   } catch (err) {
-    console.error(err);
-    return res.json({ status: false, message: 'Invalid Token' });
+    console.log(err);
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
-};
+}
 
-// Verify Endpoint
-router.get("/verify", verifyUser, (req, res) => {
-  return res.json({ status: true, message: 'Authorized' });
+//Logout
+router.get('/DelLogout',(req,res)=>{
+  res.clearCookie('token')
+  return res.json({status: true})
+})
+
+//Dashboard
+router.get('/DelLayout/DelDashboard', AuthenticateDel, async (req, res) => {
+  try {
+    if (!req.rootDel) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json(req.rootDel);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
-
-export default router;
+//Details
+router.get('/DelLayout/DelProfile', AuthenticateDel, async (req, res) => {
+  try {
+    if (!req.rootDel) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json(req.rootDel);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+export default router

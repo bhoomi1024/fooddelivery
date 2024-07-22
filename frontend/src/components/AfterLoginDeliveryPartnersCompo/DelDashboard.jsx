@@ -1,13 +1,57 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, Card, CardContent, Typography } from '@mui/material';
 import UserImage from '../../assets/graph.jpeg'; // Ensure the path is correct
+import { useNavigate } from 'react-router-dom';
 
 const DelDashboard = () => {
+  const navigate = useNavigate();
+  const [delUser, setDelUser] = useState(null);
+
+  const callDelDashboard = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/auth/DelLayout/DelDashboard', { // Update with the correct backend URL and port
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include"
+      });
+  
+      if (res.status !== 200) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+  
+      const textData = await res.text(); // Get response as text
+      console.log("Response text:", textData);
+  
+      if (!textData) {
+        throw new Error("No data received");
+      }
+  
+      try {
+        const data = JSON.parse(textData); // Manually parse JSON
+        console.log(data);
+        setDelUser(data);
+      } catch (jsonError) {
+        console.error("Failed to parse JSON:", jsonError);
+        navigate('/DelLogin');
+      }
+    } catch (err) {
+      console.log(err);
+      navigate('/DelLogin');
+    }
+  };
+
+  useEffect(() => {
+    callDelDashboard();
+  }, []);
+
   return (
     <div className="bg-gradient-to-r from-white via-yellow-100 to-white ml-60 mt-[78px] w-full font-poppins p-4 h-screen flex">
-      <div >
+      <div>
         <h2 className='flex justify-center text-2xl my-4 font-semibold'>
-          DashBoard
+          {delUser && delUser.ownerName}
         </h2>
 
         <Grid container spacing={4} justifyContent="center">

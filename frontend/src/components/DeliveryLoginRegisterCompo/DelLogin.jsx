@@ -39,7 +39,7 @@ const DelLogin = () => {
 
       if (response.data.status) {
         console.log("Login successful, navigating to /RestaurantLayout");
-        navigate("/DelLayout"); // Navigate to the after login page upon successful login
+        navigate("/DelLayout/DelDashboard"); // Navigate to the after login page upon successful login
       } else {
         setError(response.data.message || "Login failed"); // Set error state if login failed
       }

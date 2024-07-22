@@ -1,6 +1,6 @@
 // RestaurantAddMenuForm.jsx
 
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useSpring, animated } from '@react-spring/web';
 import Axios from 'axios';
@@ -12,7 +12,37 @@ const Modal = ({ show, handleClose, addMenuItem }) => {
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState("");
   const [cuisineName, setCuisineName] = useState("");
+  
   const navigate = useNavigate();
+  const callResAddMenu = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/api/menu/ResMenu', { // Update with the correct backend URL and port
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+            "Content-Type": "multipart/form-data"
+        },
+        credentials: "include"
+      });
+  
+      if (res.status !== 200) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+  
+      const data = await res.json();
+      console.log(data);
+      
+      if (!data) {
+        throw new Error("No data received");
+      }
+    } catch (err) {
+      console.log(err);
+      navigate('/ResLogin');
+    }
+  };
+  useEffect(() => {
+    callResAddMenu();
+  }, []);
 
   const animation = useSpring({
     opacity: show ? 1 : 0,
@@ -24,19 +54,23 @@ const Modal = ({ show, handleClose, addMenuItem }) => {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("dishName", dishName);
-    formData.append("price", price);
+    formData.append("price", parseFloat(price));
     formData.append("description", description);
     formData.append("cuisineName", cuisineName);
 
+ 
+
+
     console.log("Form data being sent: ", {
-      dishName, price, description, cuisineName, image: image.name
+      dishName, price: parseFloat(price), description, cuisineName, image: image.name
     });
 
     try {
       const response = await Axios.post("http://localhost:3000/api/menu/ResMenu", formData, {
         headers: {
           "Content-Type": "multipart/form-data"
-        }
+        },
+        withCredentials: true
       });
 
       if (response.status !== 200) {
