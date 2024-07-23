@@ -176,8 +176,11 @@ router.get('/UsersRestaurant', AuthenticateUser, async (req, res) => {
 //menu
 // Fetch User and Restaurant Menu Data
 router.get('/ResMenu', async (req, res) => {
+  console.log(req.rootUser); // this was returning undefined
+  
   try {
     const user = req.rootUser;
+    
     const restaurant = await RestaurantModel.findOne({ _id: user.ownerId }).populate('menu');
     if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
 

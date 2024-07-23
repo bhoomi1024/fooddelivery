@@ -13,7 +13,16 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
     const fetchMenuItems = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/api/menu/ResMenu', {
+        // const response = await axios.get('http://localhost:3000/auth/ResMenu', {
+        //   withCredentials: true,
+        //   headers: {
+        //     Accept: 'application/json',
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
+
+        // in this get method, hard coded restaurant ID will be replaced
+        const response = await axios.get(`http://localhost:3000/api/menu/ResMenu/${"669e3ede2ce2a7fde5c9c0d3"}`, {
           withCredentials: true,
           headers: {
             Accept: 'application/json',
