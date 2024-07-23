@@ -20,6 +20,7 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
             'Content-Type': 'application/json',
           },
         });
+        
 
         if (response.status === 200) {
           if (Array.isArray(response.data)) {
