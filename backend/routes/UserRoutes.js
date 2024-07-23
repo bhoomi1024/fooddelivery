@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from 'nodemailer';
 import UserModel from "../models/UserModel.js";
+import RestaurantModel from "../models/ResModel.js";
 
 const router = express.Router();
 
@@ -172,5 +173,28 @@ router.get('/UsersRestaurant', AuthenticateUser, async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+//menu
+// Fetch User and Restaurant Menu Data
+router.get('/ResMenu', async (req, res) => {
+  try {
+    const user = req.rootUser;
+    const restaurant = await RestaurantModel.findOne({ _id: user.ownerId }).populate('menu');
+    if (!restaurant) return res.status(404).json({ message: 'Restaurant not found' });
+
+    const responseData = {
+      user: user,
+      restaurant: {
+        name: restaurant.restaurantName,
+        menu: restaurant.menu
+      }
+    };
+
+    res.json(responseData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 
 export default router;

@@ -7,7 +7,8 @@ const UserSchema = new Schema({
     ownerName: { type: String, required: true},
     phone: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-   
+    ownerId: { type: mongoose.Schema.Types.ObjectId,
+        ref: 'Restaurant', required: true } 
 });
 
 const UserModel = model("User", UserSchema);

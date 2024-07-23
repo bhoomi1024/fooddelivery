@@ -10,29 +10,39 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:3000/api/menu/ResMenu', {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 200) {
+          if (Array.isArray(response.data)) {
+            setMenuItems(response.data);
+          } else if (response.data && Array.isArray(response.data.menu)) {
+            setMenuItems(response.data.menu);
+          } else {
+            setError('Received invalid data format for menu items');
+          }
+        } else {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Error fetching menu items:', err);
+        setError('Failed to fetch menu items');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMenuItems();
   }, []);
 
-  const fetchMenuItems = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:3000/api/menu/ResMenu');
-      console.log(response);
-      if (Array.isArray(response.data)) {
-        setMenuItems(response.data);
-      } else if (response.data && Array.isArray(response.data.menu)) {
-        setMenuItems(response.data.menu);
-      } else {
-        setError('Received invalid data format for menu items');
-      }
-    } catch (err) {
-      console.error('Error fetching menu items:', err);
-      setError('Failed to fetch menu items');
-    } finally {
-      setLoading(false);
-    }
-  };
-  
   if (!restaurant) return null;
 
   return (

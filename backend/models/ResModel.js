@@ -16,7 +16,12 @@ const RestaurantSchema = new Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "MenuItem"
-        }]
+        }],
+    user:[{
+        type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+    }
+    ] 
 });
 
 const RestaurantModel = model("Restaurant", RestaurantSchema);
