@@ -4,6 +4,7 @@ import { upload } from '../middleware/multer.middleware.js';
 import MenuItemModel from '../models/MenuModel.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import {Authenticate} from '../routes/ResRoutes.js'
+import {AuthenticateUser} from '../routes/UserRoutes.js'
 import fs from 'fs';
 
 
@@ -50,6 +51,24 @@ router.get('/ResMenu', Authenticate,async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch menu items' });
   }
 });
+
+// Route to get restaurant menu by restaurant ID
+router.get('/ResMenu/:resId' ,AuthenticateUser,async (req, res) => {
+  try {
+    const { resId } = req.params;
+    const menuItem = await MenuItemModel.find({
+      ownerId: resId
+    });
+    if (!menuItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+    res.status(200).json(menuItem);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch menu item' });
+  }
+});
+
+
 
 // Route to update a menu item by ID
 router.patch('/ResMenu/:id',Authenticate ,upload.single('image'), async (req, res) => {
