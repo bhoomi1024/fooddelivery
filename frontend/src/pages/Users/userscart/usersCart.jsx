@@ -3,7 +3,7 @@ import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete } from "react-icons/md";
 import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
-
+import {loadStripe} from '@stripe/stripe-js'
 const UsersCart = () => {
 
 
@@ -16,6 +16,32 @@ const UsersCart = () => {
   const handleRemoveItem = (_id) => {
     dispatch(removeFromCart(_id));
   };
+  // payment integration
+ const makePayment = async()=>{
+  const stripe = await loadStripe("pk_test_51PfmkeSHU32U4EZ1ZZGtsGphSf8hRGDxOkmHEji0Txy2lTBErrWG1iFddikkHggxolUXWrVad0Ch2uafIkO8XZoq00HBrrW9zb");
+
+  const body = {
+      products:cartItems
+  }
+  const headers = {
+      "Content-Type":"application/json"
+  }
+  const response = await fetch("http://localhost:3000/api/create-checkout-session",{
+      method:"POST",
+      headers:headers,
+      body:JSON.stringify(body)
+  });
+
+  const session = await response.json();
+
+  const result = stripe.redirectToCheckout({
+      sessionId:session.id
+  })
+  if(result.error){
+    console.log(result.error);
+}
+}
+
 
   return (
     <>
@@ -81,9 +107,12 @@ const UsersCart = () => {
             <div className="bg-gray-50 p-6 rounded-lg mb-6">
               <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
               <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
-              <button className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-neutral-950 transition duration-300">
-                Proceed to Payment
-              </button>
+              <button
+        className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
+        onClick={makePayment}
+      >
+        Proceed to Payment
+      </button>
             </div>
 
           </div>

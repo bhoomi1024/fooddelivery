@@ -18,6 +18,8 @@
     "@mui/material": "^5.16.1",
     "@react-spring/web": "^9.7.3",
     "@reduxjs/toolkit": "^2.2.6",
+    "@stripe/react-stripe-js": "^2.7.3",
+    "@stripe/stripe-js": "^4.1.0",
     "axios": "^1.7.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.407.0",
