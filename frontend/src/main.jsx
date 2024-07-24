@@ -49,9 +49,9 @@ import Usersorders from "./pages/Users/usersOrders/Usersorders.jsx";
 import UsersCart from "./pages/Users/userscart/usersCart.jsx";
 import ResOrders from "./pages/restaurant/ResOrders.jsx";
 import { Provider as ReduxProvider } from "react-redux";
-// import { PersistGate } from 'redux-persist/integration/react';
-// import store, { persistor } from "./redux/store.js";
-import store from "./redux/store.js";
+import { PersistGate } from 'redux-persist/integration/react';
+import store, { persistor } from "./redux/store.js";
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -108,10 +108,10 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ReduxProvider store={store}>
-      {/* <PersistGate loading={null} persistor={persistor}> */}
+      <PersistGate loading={null} persistor={persistor}>
         <RouterProvider router={router} />
         <Toaster position="bottom-right" />
-      {/* </PersistGate> */}
+      </PersistGate>
     </ReduxProvider>
   </React.StrictMode>
 );
