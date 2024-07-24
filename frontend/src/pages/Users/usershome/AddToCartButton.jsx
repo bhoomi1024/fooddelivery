@@ -4,16 +4,15 @@ import {useDispatch, useSelector} from 'react-redux'
 import { addToCart, decrementQuantity, incrementQuantity } from '../../../redux/slices/cartSlice';
 
 
-const AddToCartButton = ({ item, initialQuantity = 0 }) => {
-  const [quantity, setQuantity] = useState(initialQuantity);
+const AddToCartButton = ({ item }) => {
+
+  const quantity = useSelector(state => state.cart.cartItems.find(cartItem => cartItem._id === item._id)?.quantity) || 0;  
   const [isHovered, setIsHovered] = useState(false);
 
-  const dispatch = useDispatch();
-
-  // const quantity = useSelector(state => state.cart) 
+  const dispatch = useDispatch(); 
 
   const handleAddToCart = () => {
-    setQuantity(prevQuantity => prevQuantity + 1);
+
     dispatch(addToCart(item))
     toast.success(`${item.dishName} added to cart!`);
   };

@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, LogOut, Heart, UserRound, ShoppingCart } from 'lucide-react';
 import { SiGreasyfork } from 'react-icons/si';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-const Navbar = ({ cartCount, likedCount }) => {
+const Navbar = ({ likedCount }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [User, setUser] = useState([]);
   const navigate = useNavigate();
+  const cartCount = useSelector(state => state.cart.cartItems.reduce((total,item) => total + item.quantity,0));
+
 
   const callUserDashboard = async () => {
     try {
@@ -97,7 +100,7 @@ const Navbar = ({ cartCount, likedCount }) => {
                 <button className="ml-3 p-1 relative">
                   <ShoppingCart className="h-6 w-6" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                    <span className="absolute -top-3 -right-2 bg-red-400 text-white rounded-full px-2  text-sm font-bold">
                       {cartCount}
                     </span>
                   )}
@@ -107,7 +110,7 @@ const Navbar = ({ cartCount, likedCount }) => {
                 <button className="ml-3 p-1 relative">
                   <Heart className="h-6 w-6" />
                   {likedCount > 0 && (
-                    <span className="absolute -top-3 -right-4 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                    <span className="absolute -top-3 -right-2 bg-red-400 text-white rounded-full px-2  text-sm font-bold">
                       {likedCount}
                     </span>
                   )}

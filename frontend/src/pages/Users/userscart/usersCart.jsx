@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { MdDelete } from "react-icons/md";
+import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
 
 const UsersCart = () => {
-  const [promoCode, setPromoCode] = useState('');
 
-  // Sample cart items (replace with actual data)
-  const cartItems = useSelector(state => state.cart.cart) 
+
+  const cartItems = useSelector(state => state.cart.cartItems)
 
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
+  const dispatch = useDispatch();
 
-  const handleRemoveItem = (id) => {
-    // Implement remove item logic
-  
+  const handleRemoveItem = (_id) => {
+    dispatch(removeFromCart(_id));
   };
 
   return (
@@ -26,26 +27,49 @@ const UsersCart = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border p-3 text-left">Title</th>
-                  <th className="border p-3 text-left">Price</th>
-                  <th className="border p-3 text-left">Quantity</th>
-                  <th className="border p-3 text-left">Total</th>
-                  <th className="border p-3 text-left">Remove</th>
+                  <th className="border p-3 text-center">Title</th>
+                  <th className="border p-3 text-center">Price</th>
+                  <th className="border p-3 text-center">Quantity</th>
+                  <th className="border p-3 text-center">Total</th>
+                  <th className="border p-3 text-center">Remove item</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className='text-center'>
                 {cartItems.map((item) => (
                   <tr key={item.id} className="border-b">
-                    <td className="border p-3">{item.title}</td>
+                    <td className="border p-3">{item.dishName}</td>
                     <td className="border p-3">Rs. {item.price.toFixed(2)}</td>
-                    <td className="border p-3">{item.quantity}</td>
+                    <td className="flex justify-center border p-3">
+                      <button
+                        onClick={() => {
+                          dispatch(decrementQuantity(item._id));
+                        }}
+                        className="px-3 py-2 text-red-500 hover:text-red-600 transition-colors duration-300 focus:outline-none"
+                      >
+                        <svg className="w-5 h-5 " fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                          <path d="M20 12H4"></path>
+                        </svg>
+                      </button>
+                      <p className="px-3 py-2 font-semibold text-gray-800 bg-neutral-200 rounded-sm">{item.quantity}</p>
+                      <button
+                        onClick={() => {
+                          dispatch(incrementQuantity(item._id));
+                          }}
+                        className="px-3 py-2 text-green-500 hover:text-green-600 transition-colors duration-300 focus:outline-none"
+                      >
+                        <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                          <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                      </button>
+                    </td>
                     <td className="border p-3">Rs. {calculateTotal(item).toFixed(2)}</td>
                     <td className="border p-3">
                       <button
-                        onClick={() => handleRemoveItem(item.id)}
-                        className="text-yellow-500 hover:text-yellow-600 transition duration-300"
-                      >
-                        <span className="text-xl font-bold">×</span>
+                        onClick={() => handleRemoveItem(item._id)}
+                        className="text-neutral-800 hover:text-neutral-950 transition duration-300">
+                        <span >
+                          <MdDelete size={24} />
+                        </span>
                       </button>
                     </td>
                   </tr>
@@ -57,11 +81,11 @@ const UsersCart = () => {
             <div className="bg-gray-50 p-6 rounded-lg mb-6">
               <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
               <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
-              <button className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300">
+              <button className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-neutral-950 transition duration-300">
                 Proceed to Payment
               </button>
             </div>
-            
+
           </div>
         </div>
       </div>
