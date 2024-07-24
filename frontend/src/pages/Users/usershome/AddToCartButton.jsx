@@ -5,25 +5,25 @@ import { addToCart, decrementQuantity, incrementQuantity } from '../../../redux/
 
 
 const AddToCartButton = ({ item }) => {
-
-  const quantity = useSelector(state => state.cart.cartItems.find(cartItem => cartItem._id === item._id)?.quantity) || 0;  
+  const userId = localStorage.getItem('userId');
+  const quantity = useSelector(state => state.cart.cartItems.find(cartItem =>cartItem.userId == userId && cartItem._id === item._id)?.quantity) || 0;  
   const [isHovered, setIsHovered] = useState(false);
 
   const dispatch = useDispatch(); 
 
   const handleAddToCart = () => {
 
-    dispatch(addToCart(item))
+    dispatch(addToCart({...item, userId:userId}))
     toast.success(`${item.dishName} added to cart!`);
   };
 
 
   const increaseItem = () => {
-    dispatch(incrementQuantity(item._id));
+    dispatch(incrementQuantity({_id:item._id, userId:userId}));
     }
 
     const decreaseItem = () => {
-      dispatch(decrementQuantity(item._id));
+      dispatch(decrementQuantity({_id:item._id, userId:userId}));
     }
 
  

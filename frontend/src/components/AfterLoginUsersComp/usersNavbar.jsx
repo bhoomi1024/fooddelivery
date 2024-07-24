@@ -8,8 +8,9 @@ import { useSelector } from 'react-redux';
 const Navbar = ({ likedCount }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [User, setUser] = useState([]);
+  const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
-  const cartCount = useSelector(state => state.cart.cartItems.reduce((total,item) => total + item.quantity,0));
+  const cartCount = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId).reduce((total,item) => total + item.quantity,0));
 
 
   const callUserDashboard = async () => {
@@ -37,6 +38,8 @@ const Navbar = ({ likedCount }) => {
       try {
         const data = JSON.parse(textData); // Manually parse JSON
         console.log(data);
+        localStorage.setItem('userId',data._id);
+        console.log(data._id);
         setUser(data);
       } catch (jsonError) {
         console.error("Failed to parse JSON:", jsonError);
@@ -62,6 +65,7 @@ const Navbar = ({ likedCount }) => {
     axios.get('http://localhost:3000/auth/UserLogout') // Corrected URL
       .then(res => {
         if (res.data.status) {
+          localStorage.removeItem("userId");
           navigate('/UserLogin');
         }
       })

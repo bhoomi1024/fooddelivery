@@ -6,15 +6,15 @@ import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../r
 import {loadStripe} from '@stripe/stripe-js'
 const UsersCart = () => {
 
-
-  const cartItems = useSelector(state => state.cart.cartItems)
+const userId = localStorage.getItem('userId');
+  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
   const dispatch = useDispatch();
 
   const handleRemoveItem = (_id) => {
-    dispatch(removeFromCart(_id));
+    dispatch(removeFromCart({_id:_id, userId:userId}));
   };
   // payment integration
  const makePayment = async()=>{
@@ -68,7 +68,7 @@ const UsersCart = () => {
                     <td className="flex justify-center border p-3">
                       <button
                         onClick={() => {
-                          dispatch(decrementQuantity(item._id));
+                          dispatch(decrementQuantity({_id:item._id, userId: userId}));
                         }}
                         className="px-3 py-2 text-red-500 hover:text-red-600 transition-colors duration-300 focus:outline-none"
                       >
@@ -79,7 +79,7 @@ const UsersCart = () => {
                       <p className="px-3 py-2 font-semibold text-gray-800 bg-neutral-200 rounded-sm">{item.quantity}</p>
                       <button
                         onClick={() => {
-                          dispatch(incrementQuantity(item._id));
+                          dispatch(incrementQuantity({_id:item._id, userId:userId}));
                           }}
                         className="px-3 py-2 text-green-500 hover:text-green-600 transition-colors duration-300 focus:outline-none"
                       >

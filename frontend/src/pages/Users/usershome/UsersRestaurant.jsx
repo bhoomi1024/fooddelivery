@@ -4,7 +4,7 @@ import UsersRestaurantDetails from './UsersRestaurantDetails';
 import FilterOptions from '../../../components/AfterLoginUsersComp/usersFilterdetails';
 import { SlidersHorizontal } from 'lucide-react';
 import Footer from '../../../components/HomePageCompo/Footer';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SearchRestaurant from '../../../components/AfterLoginUsersComp/SearchRestaurant';
 import RestaurantHeader from '../../../components/AfterLoginUsersComp/RestaurantHeader';
@@ -25,22 +25,44 @@ const UsersRestaurant = () => {
   const [likedRestaurants, setLikedRestaurants] = useState({});
   const [rating4PlusSelected, setRating4PlusSelected] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
-
+  
   // Fetch restaurant data from the backend
   useEffect(() => {
-    axios.get('http://localhost:5173/RestaurantLayout/ResDetails')
-      .then(response => {
-        console.log("Backend response:", response.data); // Debug statement
-        if (Array.isArray(response.data)) {
-          setRestaurants(response.data); // Assuming response.data is an array of restaurant dishes
-          setFilteredRestaurants(response.data); // Initialize filteredRestaurants with fetched data
+
+    const fetchRestaurants = async () => {
+      try {
+        
+        // in this get method, hard coded restaurant ID will be replaced
+        const response = await axios.get('http://localhost:3000/auth/Restaurants', {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log(response.data);
+
+        if (response.status === 200) {
+          if (Array.isArray(response.data)) {
+            setRestaurants(response.data);
+          } else if (response.data && Array.isArray(response.data.menu)) {
+            setRestaurants(response.data.menu);
+          } else {
+            toast.error("HAWWW")
+          }
         } else {
-          console.error("Unexpected data format:", response.data);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      })
-      .catch(error => {
-        console.error("Error fetching restaurant data", error);
-      });
+      } catch (err) {
+        console.error('Error fetching menu items:', err);
+        toast.error('Failed to fetch menu items');
+      } finally {
+        
+      }
+    };
+
+    fetchRestaurants();
+
   }, []);
 
   const filterRef = useRef(null);
@@ -175,9 +197,9 @@ const UsersRestaurant = () => {
       ) : (
         <div className="px-5 mb-10">
           <h2 className="text-2xl font-bold mb-5">All Restaurants</h2>
-          {Array.isArray(filteredRestaurants) ? (
+          {Array.isArray(restaurants) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRestaurants.map((restaurant) => (
+              {restaurants.map((restaurant) => (
                 <RestaurantCard
                   key={restaurant.id}
                   restaurant={restaurant}
@@ -192,6 +214,8 @@ const UsersRestaurant = () => {
           )}
         </div>
       )}
+
+
 
       <Footer />
     </>
