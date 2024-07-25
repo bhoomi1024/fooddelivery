@@ -3,21 +3,108 @@ import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete } from "react-icons/md";
 import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
-import {loadStripe} from '@stripe/stripe-js'
+import { useNavigate } from "react-router-dom";
+
+
 const UsersCart = () => {
 
 
   const cartItems = useSelector(state => state.cart.cartItems)
-
+  
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
+ 
   const handleRemoveItem = (_id) => {
     dispatch(removeFromCart(_id));
   };
-  // payment integration
- const makePayment = async()=>{
+ // Payment integration
+ const handlePayment = async () => {
+  try {
+    const body = { products: cartItems };
+    const headers = { "Content-Type": "application/json" };
+
+    const response = await fetch("http://localhost:3000/api/payment/checkout", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const orderResponse = await response.json();
+    const { orderId, amount: orderAmount } = orderResponse;
+
+    var options = {
+      key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
+      amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      currency: "INR",
+      name: "Foodiebuddy",
+      description: "Food delivery website",
+      order_id: orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+      handler: async function (response) {
+        const paymentData = {
+          orderId: response.razorpay_order_id,
+          paymentId: response.razorpay_payment_id,
+          signature: response.razorpay_signature,
+          amount: orderAmount,
+          orderItems: cartItems,
+          quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
+        };
+
+        // Make a request to your backend to verify the payment and update the order status
+        const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(paymentData),
+        });
+        
+        const apiResponse = await api.json();
+
+        console.log("razorpay res ", apiResponse);
+
+        if (apiResponse.success) {
+          // clearCart();
+          navigate("/UsersOrders");
+        } else {
+          console.error("Payment verification failed");
+        }
+      },
+      prefill: {
+        name: "Bhoomi verma",
+        email: "vbhoomi1024@gmail.com",
+        contact: "9170302787",
+      },
+      notes: {
+        address: "krishna nagar",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+    console.log("Order response:", orderResponse);
+  } catch (error) {
+    console.error("Payment error:", error);
+  }
+};
+  
+    /*  const products = {products:cartItems}
+      const orderRepons = await axios.post('http://localhost:3000/api/payment/checkout', {
+        amount: cartTotal,
+        qty: products.quantity,
+        cartItems: cartItems.dishName,
+      });*/
+
+ /*const makePayment = async()=>{
   const stripe = await loadStripe("pk_test_51PfmkeSHU32U4EZ1ZZGtsGphSf8hRGDxOkmHEji0Txy2lTBErrWG1iFddikkHggxolUXWrVad0Ch2uafIkO8XZoq00HBrrW9zb");
 
   const body = {
@@ -40,7 +127,7 @@ const UsersCart = () => {
   if(result.error){
     console.log(result.error);
 }
-}
+}*/
 
 
   return (
@@ -109,7 +196,7 @@ const UsersCart = () => {
               <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
               <button
         className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
-        onClick={makePayment}
+        onClick={handlePayment}
       >
         Proceed to Payment
       </button>
