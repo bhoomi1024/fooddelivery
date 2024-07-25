@@ -152,21 +152,22 @@ const UsersRestaurant = () => {
     setSelectedRestaurant(null);
   };
 
-  const handleLike = (restaurantId) => {
-    setLikedRestaurants(prev => {
-      const isLiked = !prev[restaurantId];
-      const updatedLikes = {
-        ...prev,
-        [restaurantId]: isLiked,
-      };
+  // const handleLike = (restaurantId) => {
+  //   setLikedRestaurants(prev => {
+  //     const isLiked = !prev[restaurantId];
+  //     const updatedLikes = {
+  //       ...prev,
+  //       [restaurantId]: isLiked,
+  //     };
 
-      localStorage.setItem('likedRestaurants', JSON.stringify(updatedLikes));
+  //     localStorage.setItem('likedRestaurants', JSON.stringify(updatedLikes));
 
-      return updatedLikes;
-    });
-  };
+  //     return updatedLikes;
+  //   });
+  // };
 
-  const likedCount = Object.values(likedRestaurants).filter(Boolean).length;
+  // const likedCount = Object.values(likedRestaurants).filter(Boolean).length;
+  const likedCount = 0;
 
   return (
     <>
@@ -204,8 +205,9 @@ const UsersRestaurant = () => {
                   key={restaurant.id}
                   restaurant={restaurant}
                   isLiked={likedRestaurants[restaurant.id] || false}
-                  onLike={handleLike}
+                  // onLike={handleLike}
                   onClick={handleRestaurantClick}
+                  
                 />
               ))}
             </div>
