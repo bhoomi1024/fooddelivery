@@ -4,13 +4,13 @@ import UsersRestaurantDetails from './UsersRestaurantDetails';
 import FilterOptions from '../../../components/AfterLoginUsersComp/usersFilterdetails';
 import { SlidersHorizontal } from 'lucide-react';
 import Footer from '../../../components/HomePageCompo/Footer';
-import usersRestaurantData from './usersRestaurantdata.json';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SearchRestaurant from '../../../components/AfterLoginUsersComp/SearchRestaurant';
 import RestaurantHeader from '../../../components/AfterLoginUsersComp/RestaurantHeader';
 import Rating4PlusButton from '../../../components/AfterLoginUsersComp/Rating4PlusButton';
 import RestaurantCard from '../../../components/AfterLoginUsersComp/RestaurantCard';
+import axios from 'axios';
 
 const UsersRestaurant = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,10 +20,50 @@ const UsersRestaurant = () => {
     rating: null,
     priceRange: null,
   });
-  const [filteredRestaurants, setFilteredRestaurants] = useState(usersRestaurantData.restaurants);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [likedRestaurants, setLikedRestaurants] = useState({});
   const [rating4PlusSelected, setRating4PlusSelected] = useState(true);
+  const [restaurants, setRestaurants] = useState([]);
+  
+  // Fetch restaurant data from the backend
+  useEffect(() => {
+
+    const fetchRestaurants = async () => {
+      try {
+        
+        // in this get method, hard coded restaurant ID will be replaced
+        const response = await axios.get('http://localhost:3000/auth/Restaurants', {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log(response.data);
+
+        if (response.status === 200) {
+          if (Array.isArray(response.data)) {
+            setRestaurants(response.data);
+          } else if (response.data && Array.isArray(response.data.menu)) {
+            setRestaurants(response.data.menu);
+          } else {
+            toast.error("HAWWW")
+          }
+        } else {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Error fetching menu items:', err);
+        toast.error('Failed to fetch menu items');
+      } finally {
+        
+      }
+    };
+
+    fetchRestaurants();
+
+  }, []);
 
   const filterRef = useRef(null);
 
@@ -58,12 +98,12 @@ const UsersRestaurant = () => {
   };
 
   const applyFilters = (search, ratingFilter) => {
-    const filtered = usersRestaurantData.restaurants.filter((restaurant) => {
-      const firstLetter = restaurant.name.charAt(0).toLowerCase();
+    const filtered = restaurants.filter((restaurant) => {
+      const firstLetter = restaurant.dishName.charAt(0).toLowerCase();
       const searchFirstLetter = search.charAt(0).toLowerCase();
       const matchesSearchTerm = firstLetter === searchFirstLetter || search === '';
       const matchesCuisine =
-        filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisine);
+        filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisineName);
       const matchesRating = filters.rating === null || restaurant.rating >= filters.rating;
 
       return matchesSearchTerm && matchesCuisine && matchesRating;
@@ -157,19 +197,25 @@ const UsersRestaurant = () => {
       ) : (
         <div className="px-5 mb-10">
           <h2 className="text-2xl font-bold mb-5">All Restaurants</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.id}
-                restaurant={restaurant}
-                isLiked={likedRestaurants[restaurant.id] || false}
-                onLike={handleLike}
-                onClick={handleRestaurantClick}
-              />
-            ))}
-          </div>
+          {Array.isArray(restaurants) ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {restaurants.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  isLiked={likedRestaurants[restaurant.id] || false}
+                  onLike={handleLike}
+                  onClick={handleRestaurantClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <p>No restaurants available.</p>
+          )}
         </div>
       )}
+
+
 
       <Footer />
     </>

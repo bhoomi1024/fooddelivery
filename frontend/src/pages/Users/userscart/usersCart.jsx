@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
 import { useNavigate } from "react-router-dom";
+import { loadStripe } from '@stripe/stripe-js'
+import AddressPopup from './AddressPopup';
 
 
 const UsersCart = () => {
+  const [address, setAddress] = useState('');
+  const [showCartTotal, setShowCartTotal] = useState(false);
+  const [showAddressPopup, setShowAddressPopup] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
 
-  const cartItems = useSelector(state => state.cart.cartItems)
+
   
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
@@ -17,7 +25,7 @@ const UsersCart = () => {
   const navigate = useNavigate();
  
   const handleRemoveItem = (_id) => {
-    dispatch(removeFromCart(_id));
+    dispatch(removeFromCart({_id:_id, userId:userId}));
   };
  // Payment integration
  const handlePayment = async () => {
@@ -107,8 +115,26 @@ const UsersCart = () => {
  /*const makePayment = async()=>{
   const stripe = await loadStripe("pk_test_51PfmkeSHU32U4EZ1ZZGtsGphSf8hRGDxOkmHEji0Txy2lTBErrWG1iFddikkHggxolUXWrVad0Ch2uafIkO8XZoq00HBrrW9zb");
 
-  const body = {
-      products:cartItems
+    const body = {
+      products: cartItems
+    }
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const response = await fetch("http://localhost:3000/api/create-checkout-session", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+
+    const session = await response.json();
+
+    const result = stripe.redirectToCheckout({
+      sessionId: session.id
+    })
+    if(result.error) {
+      console.log(result.error);
+    }
   }
   const headers = {
       "Content-Type":"application/json"
@@ -155,7 +181,7 @@ const UsersCart = () => {
                     <td className="flex justify-center border p-3">
                       <button
                         onClick={() => {
-                          dispatch(decrementQuantity(item._id));
+                          dispatch(decrementQuantity({_id:item._id, userId: userId}));
                         }}
                         className="px-3 py-2 text-red-500 hover:text-red-600 transition-colors duration-300 focus:outline-none"
                       >
@@ -166,7 +192,7 @@ const UsersCart = () => {
                       <p className="px-3 py-2 font-semibold text-gray-800 bg-neutral-200 rounded-sm">{item.quantity}</p>
                       <button
                         onClick={() => {
-                          dispatch(incrementQuantity(item._id));
+                          dispatch(incrementQuantity({_id:item._id, userId:userId}));
                           }}
                         className="px-3 py-2 text-green-500 hover:text-green-600 transition-colors duration-300 focus:outline-none"
                       >
@@ -202,9 +228,51 @@ const UsersCart = () => {
       </button>
             </div>
 
+            {!showCartTotal ? (
+              <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
+                <button
+                  onClick={() => setShowAddressPopup(true)}
+                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                >
+                  Enter Delivery Address
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Delivery Address</h2>
+                  <button
+                    onClick={handleEditAddress}
+                    className="text-yellow-500 hover:text-yellow-600 transition duration-300"
+                  >
+                    <MdEdit size={24} />
+                  </button>
+                </div>
+                <p className="mb-4 p-3 bg-white rounded shadow">{address}</p>
+                <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
+                <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
+                <button
+                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                  onClick={makePayment}
+                >
+                  Proceed to Payment
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <AddressPopup 
+        showAddressPopup={showAddressPopup}
+        isEditing={isEditing}
+        address={address}
+        setAddress={setAddress}
+        handleAddressSubmit={handleAddressSubmit}
+        setShowAddressPopup={setShowAddressPopup}
+        setIsEditing={setIsEditing}
+      />
     </>
   );
 };

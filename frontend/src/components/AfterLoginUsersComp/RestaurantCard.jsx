@@ -2,7 +2,7 @@
 import React from 'react';
 import LikeButton from './LikeButton';
 
-const RestaurantCard = ({ restaurant, isLiked, onLike, onClick }) => {
+const RestaurantCard = ({ restaurant, isLiked, onLike, onClick, menuItems }) => {
   return (
     <div
       key={restaurant.id}
@@ -11,8 +11,8 @@ const RestaurantCard = ({ restaurant, isLiked, onLike, onClick }) => {
     >
       <div className="relative">
         <img
-          src={restaurant.image}
-          alt={restaurant.name}
+          src={"https://res.cloudinary.com/ddyejtuqb/image/upload/v1719814366/resss_mqx2vx.jpg"}
+          alt={restaurant.restaurantName}
           className="w-full h-48 object-cover rounded-lg mb-5"
         />
         <LikeButton
@@ -20,8 +20,8 @@ const RestaurantCard = ({ restaurant, isLiked, onLike, onClick }) => {
           onLike={() => onLike(restaurant.id)}
         />
       </div>
-      <h3 className="text-xl font-bold mb-2">{restaurant.name}</h3>
-      <p className="text-gray-600 mb-2">{restaurant.cuisine}</p>
+      <h3 className="text-xl font-bold mb-2">{restaurant.restaurantName}</h3>
+      <p className="text-gray-600 mb-2">{restaurant.cuisineName}</p>
       <p className="text-gray-600 mb-2">{'⭐'.repeat(restaurant.rating)}</p>
     </div>
   );

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import nodemailer from 'nodemailer';
 import RestaurantModel from "../models/ResModel.js";
+import { AuthenticateUser } from "./UserRoutes.js";
 
 const router = express.Router();
 
@@ -192,6 +193,22 @@ router.patch('/updateDetails/:restaurantId', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// Route to get all restaurants
+router.get('/Restaurants',AuthenticateUser, async (req,res) => {
+  try {
+    const restaurants = await RestaurantModel.find({}).select("-password -ownerName").populate("menu");
+    console.log(restaurants);
+    if(restaurants){
+      return res.status(200).json(restaurants);
+    }
+    return res.status(500).json({ error: 'Internal server error' });
+
+  } catch (error) {
+    console.error('Error updating details:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
 
 
 export default router;
