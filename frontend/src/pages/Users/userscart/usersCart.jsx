@@ -4,21 +4,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete, MdEdit } from "react-icons/md";
 import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
 import { useNavigate } from "react-router-dom";
-import { loadStripe } from '@stripe/stripe-js'
 import AddressPopup from './AddressPopup';
-
+import axios from 'axios';
 
 const UsersCart = () => {
   const [address, setAddress] = useState('');
+  const [country, setCountry] = useState('');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
   const [showCartTotal, setShowCartTotal] = useState(false);
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
+  const [error, setError] = useState(null); // Add error stat
   const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
-
-
-  
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
   const dispatch = useDispatch();
@@ -27,6 +27,29 @@ const UsersCart = () => {
   const handleRemoveItem = (_id) => {
     dispatch(removeFromCart({_id:_id, userId:userId}));
   };
+ //Address
+ const handleDeliveryAddress = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:3000/api/addresses/Deliveryaddress", {
+      address,
+      country,
+      state,
+      city,
+   
+    });
+    console.log(response);
+  } catch (err) {
+    if (err.response) {
+      console.error(err.response.data); 
+      console.error(err.response.status); 
+      setError(err.response.data.error); 
+    } else {
+      console.error(err); 
+    }
+  }
+};
+
  // Payment integration
  const handlePayment = async () => {
   try {
@@ -105,56 +128,18 @@ const UsersCart = () => {
   }
 };
   
-    /*  const products = {products:cartItems}
-      const orderRepons = await axios.post('http://localhost:3000/api/payment/checkout', {
-        amount: cartTotal,
-        qty: products.quantity,
-        cartItems: cartItems.dishName,
-      });*/
+    
+const handleAddressSubmit = (e) => {
+  e.preventDefault();
+  setShowCartTotal(true);
+  setShowAddressPopup(false);
+  setIsEditing(false);
+};
 
- /*const makePayment = async()=>{
-  const stripe = await loadStripe("pk_test_51PfmkeSHU32U4EZ1ZZGtsGphSf8hRGDxOkmHEji0Txy2lTBErrWG1iFddikkHggxolUXWrVad0Ch2uafIkO8XZoq00HBrrW9zb");
-
-    const body = {
-      products: cartItems
-    }
-    const headers = {
-      "Content-Type": "application/json"
-    }
-    const response = await fetch("http://localhost:3000/api/create-checkout-session", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body)
-    });
-
-    const session = await response.json();
-
-    const result = stripe.redirectToCheckout({
-      sessionId: session.id
-    })
-    if(result.error) {
-      console.log(result.error);
-    }
-  }
-  const headers = {
-      "Content-Type":"application/json"
-  }
-  const response = await fetch("http://localhost:3000/api/create-checkout-session",{
-      method:"POST",
-      headers:headers,
-      body:JSON.stringify(body)
-  });
-
-  const session = await response.json();
-
-  const result = stripe.redirectToCheckout({
-      sessionId:session.id
-  })
-  if(result.error){
-    console.log(result.error);
-}
-}*/
-
+const handleEditAddress = () => {
+  setIsEditing(true);
+  setShowAddressPopup(true);
+};
 
   return (
     <>
@@ -249,12 +234,14 @@ const UsersCart = () => {
                     <MdEdit size={24} />
                   </button>
                 </div>
-                <p className="mb-4 p-3 bg-white rounded shadow">{address}</p>
+                <p className="mb-4 p-3 bg-white rounded shadow">
+                  {country}, {state}, {city}, {address}
+                </p>
                 <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
                 <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
                 <button
                   className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                  onClick={makePayment}
+                  onClick={handlePayment}
                 >
                   Proceed to Payment
                 </button>
@@ -269,7 +256,13 @@ const UsersCart = () => {
         isEditing={isEditing}
         address={address}
         setAddress={setAddress}
-        handleAddressSubmit={handleAddressSubmit}
+        country={country}
+        setCountry={setCountry}
+        state={state}
+        setState={setState}
+        city={city}
+        setCity={setCity}
+        handleAddressSubmit={handleDeliveryAddress}
         setShowAddressPopup={setShowAddressPopup}
         setIsEditing={setIsEditing}
       />

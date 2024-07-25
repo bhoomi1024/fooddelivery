@@ -8,7 +8,7 @@ import DelRoutes from './routes/DelRoutes.js'
 import cookieParser from "cookie-parser";
 import menuRoutes from './routes/menuRoutes.js'; // Adjust path as needed
 import paymentRouter from './routes/payment.js'
-
+import addressRoutes from './routes/AddressRoutes.js'
 //import Stripe from "stripe";
 
 
@@ -32,39 +32,8 @@ app.use('/auth', DelRoutes);
 app.use('/api/menu', menuRoutes);
 // payment Router
 app.use('/api/payment',paymentRouter)
-// checkout api
-
-/*app.post("/api/create-checkout-session",async(req,res)=>{
-    const stripe = Stripe('sk_test_51PfmkeSHU32U4EZ1q42LgYw341ypg4NQOrYz0Muo93KzpPTk4gn9pODlFrWQLDu4MF04c9mCftyrA78gk5gOw3Oj00ZXoGGv8M')
-    const {products} = req.body;
-console.log(products)
-
-    const lineItems = products.map((product)=>({
-        price_data:{
-            currency:"inr",
-            product_data:{
-                name:product.dishName,
-               
-            },
-            unit_amount:product.price * 100,
-        },
-        quantity:product.quantity
-    }));
-
-    const session = await stripe.checkout.sessions.create({
-        submit_type:'pay',
-        payment_method_types:["card"],
-        billing_address_collection:'auto',
-        shipping_options : [{shipping_rate: "shr_1Pg11ISHU32U4EZ1IeYMeFt6"}],
-        line_items:lineItems,
-        mode:"payment",
-        success_url:"http://localhost:3000/UsersOrders",
-        cancel_url:"http://localhost:3000/UsersCart",
-    });
-
-    res.json({id:session.id})
- 
-})*/
+//DelAddres Router
+app.use('/api/addresses', addressRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
