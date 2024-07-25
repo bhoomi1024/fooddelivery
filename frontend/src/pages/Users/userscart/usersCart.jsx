@@ -16,7 +16,7 @@ const UsersCart = () => {
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
-  const [error, setError] = useState(null); // Add error stat
+  const [error, setError] = useState(null);
   const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
   const calculateTotal = (item) => item.price * item.quantity;
@@ -27,119 +27,110 @@ const UsersCart = () => {
   const handleRemoveItem = (_id) => {
     dispatch(removeFromCart({_id:_id, userId:userId}));
   };
- //Address
- const handleDeliveryAddress = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axios.post("http://localhost:3000/api/addresses/Deliveryaddress", {
-      address,
-      country,
-      state,
-      city,
-   
-    });
-    console.log(response);
-  } catch (err) {
-    if (err.response) {
-      console.error(err.response.data); 
-      console.error(err.response.status); 
-      setError(err.response.data.error); 
-    } else {
-      console.error(err); 
+
+  const handleDeliveryAddress = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3000/api/addresses/Deliveryaddress", {
+        address,
+        country,
+        state,
+        city,
+      });
+      console.log(response);
+      setShowCartTotal(true);
+      setShowAddressPopup(false);
+      setIsEditing(false);
+    } catch (err) {
+      if (err.response) {
+        console.error(err.response.data); 
+        console.error(err.response.status); 
+        setError(err.response.data.error); 
+      } else {
+        console.error(err); 
+      }
     }
-  }
-};
+  };
 
- // Payment integration
- const handlePayment = async () => {
-  try {
-    const body = { products: cartItems };
-    const headers = { "Content-Type": "application/json" };
+  const handlePayment = async () => {
+    try {
+      const body = { products: cartItems };
+      const headers = { "Content-Type": "application/json" };
 
-    const response = await fetch("http://localhost:3000/api/payment/checkout", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body),
-    });
+      const response = await fetch("http://localhost:3000/api/payment/checkout", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
+      });
 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const orderResponse = await response.json();
+      const { orderId, amount: orderAmount } = orderResponse;
+
+      var options = {
+        key: "rzp_test_Jp05EcVr7cQRf3",
+        amount: orderAmount * 100,
+        currency: "INR",
+        name: "Foodiebuddy",
+        description: "Food delivery website",
+        order_id: orderId,
+        handler: async function (response) {
+          const paymentData = {
+            orderId: response.razorpay_order_id,
+            paymentId: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            amount: orderAmount,
+            orderItems: cartItems,
+            quantity: cartItems.reduce((total, item) => total + item.quantity, 0),
+          };
+
+          const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentData),
+          });
+          
+          const apiResponse = await api.json();
+
+          console.log("razorpay res ", apiResponse);
+
+          if (apiResponse.success) {
+            navigate("/UsersOrders");
+          } else {
+            console.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: "Bhoomi verma",
+          email: "vbhoomi1024@gmail.com",
+          contact: "9170302787",
+        },
+        notes: {
+          address: "krishna nagar",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+
+      console.log("Order response:", orderResponse);
+    } catch (error) {
+      console.error("Payment error:", error);
     }
-
-    const orderResponse = await response.json();
-    const { orderId, amount: orderAmount } = orderResponse;
-
-    var options = {
-      key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
-      amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: "INR",
-      name: "Foodiebuddy",
-      description: "Food delivery website",
-      order_id: orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      handler: async function (response) {
-        const paymentData = {
-          orderId: response.razorpay_order_id,
-          paymentId: response.razorpay_payment_id,
-          signature: response.razorpay_signature,
-          amount: orderAmount,
-          orderItems: cartItems,
-          quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
-        };
-
-        // Make a request to your backend to verify the payment and update the order status
-        const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentData),
-        });
-        
-        const apiResponse = await api.json();
-
-        console.log("razorpay res ", apiResponse);
-
-        if (apiResponse.success) {
-          // clearCart();
-          navigate("/UsersOrders");
-        } else {
-          console.error("Payment verification failed");
-        }
-      },
-      prefill: {
-        name: "Bhoomi verma",
-        email: "vbhoomi1024@gmail.com",
-        contact: "9170302787",
-      },
-      notes: {
-        address: "krishna nagar",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-
-    console.log("Order response:", orderResponse);
-  } catch (error) {
-    console.error("Payment error:", error);
-  }
-};
+  };
   
-    
-const handleAddressSubmit = (e) => {
-  e.preventDefault();
-  setShowCartTotal(true);
-  setShowAddressPopup(false);
-  setIsEditing(false);
-};
-
-const handleEditAddress = () => {
-  setIsEditing(true);
-  setShowAddressPopup(true);
-};
+  const handleEditAddress = () => {
+    setIsEditing(true);
+    setShowAddressPopup(true);
+  };
 
   return (
     <>
@@ -202,28 +193,7 @@ const handleEditAddress = () => {
             </table>
           </div>
           <div className="md:w-1/3">
-            <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
-              <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
-              <button
-        className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
-        onClick={handlePayment}
-      >
-        Proceed to Payment
-      </button>
-            </div>
-
-            {!showCartTotal ? (
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
-                <button
-                  onClick={() => setShowAddressPopup(true)}
-                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                >
-                  Enter Delivery Address
-                </button>
-              </div>
-            ) : (
+            {showCartTotal ? (
               <div className="bg-gray-50 p-6 rounded-lg mb-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Delivery Address</h2>
@@ -244,6 +214,16 @@ const handleEditAddress = () => {
                   onClick={handlePayment}
                 >
                   Proceed to Payment
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
+                <button
+                  onClick={() => setShowAddressPopup(true)}
+                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                >
+                  Enter Delivery Address
                 </button>
               </div>
             )}
