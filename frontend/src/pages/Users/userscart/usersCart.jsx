@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete, MdEdit } from "react-icons/md";
-import { decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
+import { clearCart, decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
 import { useNavigate } from "react-router-dom";
-import { loadStripe } from '@stripe/stripe-js'
 import AddressPopup from './AddressPopup';
 
 
@@ -17,7 +16,12 @@ const UsersCart = () => {
   const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
 
-
+  const handleAddressSubmit = (e) => {
+    e.preventDefault();
+    setShowCartTotal(true);
+    setShowAddressPopup(false);
+    setIsEditing(false);
+  };
   
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
@@ -56,6 +60,7 @@ const UsersCart = () => {
       handler: async function (response) {
         const paymentData = {
           orderId: response.razorpay_order_id,
+          ownerId: userId,
           paymentId: response.razorpay_payment_id,
           signature: response.razorpay_signature,
           amount: orderAmount,
@@ -77,7 +82,7 @@ const UsersCart = () => {
         console.log("razorpay res ", apiResponse);
 
         if (apiResponse.success) {
-          // clearCart();
+          dispatch(clearCart({userId: userId}));
           navigate("/UsersOrders");
         } else {
           console.error("Payment verification failed");

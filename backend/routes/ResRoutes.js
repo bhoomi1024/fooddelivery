@@ -198,7 +198,7 @@ router.patch('/updateDetails/:restaurantId', async (req, res) => {
 router.get('/Restaurants',AuthenticateUser, async (req,res) => {
   try {
     const restaurants = await RestaurantModel.find({}).select("-password -ownerName").populate("menu");
-    console.log(restaurants);
+    
     if(restaurants){
       return res.status(200).json(restaurants);
     }

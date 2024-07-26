@@ -39,6 +39,7 @@ export const checkout = async (req, res) => {
 export const verify = async (req, res) => {
   const {
     orderId,
+    ownerId,
     paymentId,
     signature,
     amount,
@@ -47,6 +48,7 @@ export const verify = async (req, res) => {
 
   let orderConfirm = await Payment.create({
     orderId,
+    ownerId,
     paymentId,
     signature,
     amount,
