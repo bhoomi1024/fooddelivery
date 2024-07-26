@@ -7,7 +7,7 @@ import UserRoutes from './routes/UserRoutes.js';
 import DelRoutes from './routes/DelRoutes.js'
 import cookieParser from "cookie-parser";
 import menuRoutes from './routes/menuRoutes.js'; // Adjust path as needed
-import paymentRouter from './routes/payment.js'
+import paymentRouter from './routes/paymentRoutes.js'
 import addressRoutes from './routes/AddressRoutes.js'
 //import Stripe from "stripe";
 

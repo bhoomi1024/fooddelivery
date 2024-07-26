@@ -1,5 +1,5 @@
 import express from 'express';
-import DeliveryAddressModel from '../models/DelAddress.js';
+import DeliveryAddressModel from '../models/DelAddressModel.js';
 
 const router = express.Router();
 

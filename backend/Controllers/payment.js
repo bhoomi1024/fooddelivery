@@ -1,4 +1,4 @@
-import { Payment } from "../models/Payment.js";
+import { Payment } from "../models/PaymentModel.js";
 import Razorpay from "razorpay";
 import dotenv from 'dotenv'
 

@@ -109,7 +109,7 @@ const UsersCart = () => {
           const apiResponse = await api.json();
           console.log("razorpay res ", apiResponse);
           if (apiResponse.success) {
-            clearCart();
+            dispatch(clearCart({userId: userId}));
             navigate("/UsersOrders");
           } else {
             console.error("Payment verification failed");
