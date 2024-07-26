@@ -28,7 +28,7 @@ const MenuItemSchema = new mongoose.Schema({
     default: true,
   },
   ownerId: { type: mongoose.Schema.Types.ObjectId,
-  ref: 'Restaurant', required: true } // Link to the Restaurent model
+  ref: 'User', required: true } // Link to the users model
 });
 
 const MenuItemModel = mongoose.model('MenuItem', MenuItemSchema);
