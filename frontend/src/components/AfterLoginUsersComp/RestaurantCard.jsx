@@ -1,8 +1,10 @@
-// src/components/AfterLoginUsersComp/RestaurantCard.js
 import React from 'react';
 import LikeButton from './LikeButton';
 
-const RestaurantCard = ({ restaurant, isLiked, onLike, onClick, menuItems }) => {
+const RestaurantCard = ({ restaurant,  onLike, onClick }) => {
+  const checking = () => {
+    console.log('clicked');
+  };
   return (
     <div
       key={restaurant.id}
@@ -16,8 +18,10 @@ const RestaurantCard = ({ restaurant, isLiked, onLike, onClick, menuItems }) => 
           className="w-full h-48 object-cover rounded-lg mb-5"
         />
         <LikeButton
-          isLiked={isLiked}
-          onLike={() => onLike(restaurant.id)}
+          // isLiked={isLiked}
+          // onLike={onLike}
+          onClick={checking}
+          restaurantId={restaurant.id} 
         />
       </div>
       <h3 className="text-xl font-bold mb-2">{restaurant.restaurantName}</h3>

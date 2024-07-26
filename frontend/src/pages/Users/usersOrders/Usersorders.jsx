@@ -34,18 +34,11 @@ const StatusBadge = ({ status }) => {
 
 const Usersorder = () => {
   const [orders, setOrders] = useState([
-    { id: 1, price: 50.00, status: 'Processing' },
+    { orderId: 1, price: 50.00, status: 'Processing' },
     { id: 2, price: 75.50, status: 'Shipped' },
     { id: 3, price: 25.99, status: 'Delivered' },
   ]);
 
-  const handleCancelOrder = (orderId) => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === orderId ? { ...order, status: 'Cancelled' } : order
-      )
-    );
-  };
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -59,7 +52,7 @@ const Usersorder = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -70,18 +63,7 @@ const Usersorder = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <StatusBadge status={order.status} />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {order.status !== 'Cancelled' ? (
-                      <button 
-                        onClick={() => handleCancelOrder(order.id)}
-                        className="text-red-600 hover:text-red-800 transition duration-150 ease-in-out"
-                      >
-                        Cancel Order
-                      </button>
-                    ) : (
-                      <span className="text-gray-500">Cancelled</span>
-                    )}
-                  </td>
+                  
                 </tr>
               ))}
             </tbody>

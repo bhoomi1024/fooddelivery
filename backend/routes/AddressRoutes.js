@@ -15,7 +15,7 @@ router.post('/deliveryaddress', AuthenticateUser, async (req, res) => {
       country,
       state,
       city,
-      ownerId
+   
     });
 
     await FullAddress.save();
