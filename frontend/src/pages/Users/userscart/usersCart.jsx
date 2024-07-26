@@ -5,14 +5,18 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { clearCart, decrementQuantity, incrementQuantity, removeFromCart } from '../../../redux/slices/cartSlice';
 import { useNavigate } from "react-router-dom";
 import AddressPopup from './AddressPopup';
-
+import axios from 'axios';
 
 const UsersCart = () => {
   const [address, setAddress] = useState('');
+  const [country, setCountry] = useState('');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
   const [showCartTotal, setShowCartTotal] = useState(false);
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
+  const [error, setError] = useState(null);
   const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
 
@@ -22,144 +26,120 @@ const UsersCart = () => {
     setShowAddressPopup(false);
     setIsEditing(false);
   };
-  
+
   const calculateTotal = (item) => item.price * item.quantity;
   const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
- 
+
   const handleRemoveItem = (_id) => {
-    dispatch(removeFromCart({_id:_id, userId:userId}));
+    dispatch(removeFromCart({ _id: _id, userId: userId }));
   };
- // Payment integration
- const handlePayment = async () => {
-  try {
-    const body = { products: cartItems };
-    const headers = { "Content-Type": "application/json" };
 
-    const response = await fetch("http://localhost:3000/api/payment/checkout", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+  const handleDeliveryAddress = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3000/api/addresses/Deliveryaddress", {
+        address,
+        country,
+        state,
+        city,
+      });
+      console.log(response);
+      setShowCartTotal(true);
+      setShowAddressPopup(false);
+      setIsEditing(false);
+    } catch (err) {
+      if (err.response) {
+        console.error(err.response.data);
+        console.error(err.response.status);
+        setError(err.response.data.error);
+      } else {
+        console.error(err);
+      }
     }
+  };
 
-    const orderResponse = await response.json();
-    const { orderId, amount: orderAmount } = orderResponse;
+  const handlePayment = async () => {
+    try {
+      const body = { products: cartItems };
+      const headers = { "Content-Type": "application/json" };
 
-    var options = {
-      key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
-      amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: "INR",
-      name: "Foodiebuddy",
-      description: "Food delivery website",
-      order_id: orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      handler: async function (response) {
-        const paymentData = {
-          orderId: response.razorpay_order_id,
-          ownerId: userId,
-          paymentId: response.razorpay_payment_id,
-          signature: response.razorpay_signature,
-          amount: orderAmount,
-          orderItems: cartItems,
-          quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
-        };
 
-        // Make a request to your backend to verify the payment and update the order status
-        const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentData),
-        });
-        
-        const apiResponse = await api.json();
+      const response = await fetch("http://localhost:3000/api/payment/checkout", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(body),
+      });
 
-        console.log("razorpay res ", apiResponse);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-        if (apiResponse.success) {
-          dispatch(clearCart({userId: userId}));
-          navigate("/UsersOrders");
-        } else {
-          console.error("Payment verification failed");
-        }
-      },
-      prefill: {
-        name: "Bhoomi verma",
-        email: "vbhoomi1024@gmail.com",
-        contact: "9170302787",
-      },
-      notes: {
-        address: "krishna nagar",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+      const orderResponse = await response.json();
+      const { orderId, amount: orderAmount } = orderResponse;
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      var options = {
+        key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
+        amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        currency: "INR",
+        name: "Foodiebuddy",
+        description: "Food delivery website",
+        order_id: orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        handler: async function (response) {
+          const paymentData = {
+            orderId: response.razorpay_order_id,
+            ownerId: userId,
+            paymentId: response.razorpay_payment_id,
+            signature: response.razorpay_signature,
+            amount: orderAmount,
+            orderItems: cartItems,
+            quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
+          };
 
-    console.log("Order response:", orderResponse);
-  } catch (error) {
-    console.error("Payment error:", error);
-  }
-};
-  
-    /*  const products = {products:cartItems}
-      const orderRepons = await axios.post('http://localhost:3000/api/payment/checkout', {
-        amount: cartTotal,
-        qty: products.quantity,
-        cartItems: cartItems.dishName,
-      });*/
+          // Make a request to your backend to verify the payment and update the order status
+          const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentData),
+          });
 
- /*const makePayment = async()=>{
-  const stripe = await loadStripe("pk_test_51PfmkeSHU32U4EZ1ZZGtsGphSf8hRGDxOkmHEji0Txy2lTBErrWG1iFddikkHggxolUXWrVad0Ch2uafIkO8XZoq00HBrrW9zb");
-
-    const body = {
-      products: cartItems
+          const apiResponse = await api.json();
+          console.log("razorpay res ", apiResponse);
+          if (apiResponse.success) {
+            clearCart();
+            navigate("/UsersOrders");
+          } else {
+            console.error("Payment verification failed");
+          }
+        },
+        prefill: {
+          name: "Bhoomi verma",
+          email: "vbhoomi1024@gmail.com",
+          contact: "9170302787",
+        },
+        notes: {
+          address: "krishna nagar",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+      console.log("Order response:", orderResponse);
+    } catch (error) {
+      console.error("Payment error:", error);
     }
-    const headers = {
-      "Content-Type": "application/json"
-    }
-    const response = await fetch("http://localhost:3000/api/create-checkout-session", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body)
-    });
+  };
 
-    const session = await response.json();
 
-    const result = stripe.redirectToCheckout({
-      sessionId: session.id
-    })
-    if(result.error) {
-      console.log(result.error);
-    }
-  }
-  const headers = {
-      "Content-Type":"application/json"
-  }
-  const response = await fetch("http://localhost:3000/api/create-checkout-session",{
-      method:"POST",
-      headers:headers,
-      body:JSON.stringify(body)
-  });
-
-  const session = await response.json();
-
-  const result = stripe.redirectToCheckout({
-      sessionId:session.id
-  })
-  if(result.error){
-    console.log(result.error);
-}
-}*/
-
+  const handleEditAddress = () => {
+    setIsEditing(true);
+    setShowAddressPopup(true);
+  };
 
   return (
     <>
@@ -186,7 +166,7 @@ const UsersCart = () => {
                     <td className="flex justify-center border p-3">
                       <button
                         onClick={() => {
-                          dispatch(decrementQuantity({_id:item._id, userId: userId}));
+                          dispatch(decrementQuantity({ _id: item._id, userId: userId }));
                         }}
                         className="px-3 py-2 text-red-500 hover:text-red-600 transition-colors duration-300 focus:outline-none"
                       >
@@ -197,8 +177,8 @@ const UsersCart = () => {
                       <p className="px-3 py-2 font-semibold text-gray-800 bg-neutral-200 rounded-sm">{item.quantity}</p>
                       <button
                         onClick={() => {
-                          dispatch(incrementQuantity({_id:item._id, userId:userId}));
-                          }}
+                          dispatch(incrementQuantity({ _id: item._id, userId: userId }));
+                        }}
                         className="px-3 py-2 text-green-500 hover:text-green-600 transition-colors duration-300 focus:outline-none"
                       >
                         <svg className="w-5 h-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -222,28 +202,7 @@ const UsersCart = () => {
             </table>
           </div>
           <div className="md:w-1/3">
-            <div className="bg-gray-50 p-6 rounded-lg mb-6">
-              <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
-              <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
-              <button
-        className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition duration-300"
-        onClick={handlePayment}
-      >
-        Proceed to Payment
-      </button>
-            </div>
-
-            {!showCartTotal ? (
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
-                <button
-                  onClick={() => setShowAddressPopup(true)}
-                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                >
-                  Enter Delivery Address
-                </button>
-              </div>
-            ) : (
+            {showCartTotal ? (
               <div className="bg-gray-50 p-6 rounded-lg mb-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Delivery Address</h2>
@@ -254,14 +213,26 @@ const UsersCart = () => {
                     <MdEdit size={24} />
                   </button>
                 </div>
-                <p className="mb-4 p-3 bg-white rounded shadow">{address}</p>
+                <p className="mb-4 p-3 bg-white rounded shadow">
+                  {country}, {state}, {city}, {address}
+                </p>
                 <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
                 <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
                 <button
                   className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                  onClick={makePayment}
+                  onClick={handlePayment}
                 >
                   Proceed to Payment
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
+                <button
+                  onClick={() => setShowAddressPopup(true)}
+                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                >
+                  Enter Delivery Address
                 </button>
               </div>
             )}
@@ -269,12 +240,18 @@ const UsersCart = () => {
         </div>
       </div>
 
-      <AddressPopup 
+      <AddressPopup
         showAddressPopup={showAddressPopup}
         isEditing={isEditing}
         address={address}
         setAddress={setAddress}
-        handleAddressSubmit={handleAddressSubmit}
+        country={country}
+        setCountry={setCountry}
+        state={state}
+        setState={setState}
+        city={city}
+        setCity={setCity}
+        handleAddressSubmit={handleDeliveryAddress}
         setShowAddressPopup={setShowAddressPopup}
         setIsEditing={setIsEditing}
       />
