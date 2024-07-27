@@ -26,13 +26,9 @@ const UsersRestaurant = () => {
   const [rating4PlusSelected, setRating4PlusSelected] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
   
-  // Fetch restaurant data from the backend
   useEffect(() => {
-
     const fetchRestaurants = async () => {
       try {
-        
-        // in this get method, hard coded restaurant ID will be replaced
         const response = await axios.get('http://localhost:3000/auth/Restaurants', {
           withCredentials: true,
           headers: {
@@ -45,24 +41,23 @@ const UsersRestaurant = () => {
         if (response.status === 200) {
           if (Array.isArray(response.data)) {
             setRestaurants(response.data);
+            setFilteredRestaurants(response.data);
           } else if (response.data && Array.isArray(response.data.menu)) {
             setRestaurants(response.data.menu);
+            setFilteredRestaurants(response.data.menu);
           } else {
-            toast.error("HAWWW")
+            toast.error("Invalid data format received")
           }
         } else {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
       } catch (err) {
-        console.error('Error fetching menu items:', err);
-        toast.error('Failed to fetch menu items');
-      } finally {
-        
+        console.error('Error fetching restaurants:', err);
+        toast.error('Failed to fetch restaurants');
       }
     };
 
     fetchRestaurants();
-
   }, []);
 
   const filterRef = useRef(null);
@@ -75,7 +70,7 @@ const UsersRestaurant = () => {
   const handleSearch = (event) => {
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
-    applyFilters(searchTerm);
+    applyFilters(searchTerm, filters.rating);
   };
 
   const toggleFilters = () => {
@@ -99,23 +94,17 @@ const UsersRestaurant = () => {
 
   const applyFilters = (search, ratingFilter) => {
     const filtered = restaurants.filter((restaurant) => {
-      const firstLetter = restaurant.dishName.charAt(0).toLowerCase();
+      const restaurantNameFirstLetter = restaurant.restaurantName.charAt(0).toLowerCase();
       const searchFirstLetter = search.charAt(0).toLowerCase();
-      const matchesSearchTerm = firstLetter === searchFirstLetter || search === '';
+      const matchesSearchTerm = restaurantNameFirstLetter === searchFirstLetter || search === '';
       const matchesCuisine =
         filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisineName);
-      const matchesRating = filters.rating === null || restaurant.rating >= filters.rating;
+      const matchesRating = ratingFilter === null || restaurant.rating >= ratingFilter;
 
       return matchesSearchTerm && matchesCuisine && matchesRating;
     });
 
-    if (rating4PlusSelected) {
-      const ratingFiltered = filtered.filter((restaurant) => restaurant.rating >= 4);
-      setFilteredRestaurants(ratingFiltered);
-    } else {
-      setFilteredRestaurants(filtered);
-    }
-
+    setFilteredRestaurants(filtered);
     setShowFilters(false);
   };
 
@@ -152,21 +141,6 @@ const UsersRestaurant = () => {
     setSelectedRestaurant(null);
   };
 
-  // const handleLike = (restaurantId) => {
-  //   setLikedRestaurants(prev => {
-  //     const isLiked = !prev[restaurantId];
-  //     const updatedLikes = {
-  //       ...prev,
-  //       [restaurantId]: isLiked,
-  //     };
-
-  //     localStorage.setItem('likedRestaurants', JSON.stringify(updatedLikes));
-
-  //     return updatedLikes;
-  //   });
-  // };
-
-  // const likedCount = Object.values(likedRestaurants).filter(Boolean).length;
   const likedCount = 0;
 
   return (
@@ -198,16 +172,14 @@ const UsersRestaurant = () => {
       ) : (
         <div className="px-5 mb-10">
           <h2 className="text-2xl font-bold mb-5">All Restaurants</h2>
-          {Array.isArray(restaurants) ? (
+          {filteredRestaurants.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {restaurants.map((restaurant) => (
+              {filteredRestaurants.map((restaurant) => (
                 <RestaurantCard
                   key={restaurant.id}
                   restaurant={restaurant}
                   isLiked={likedRestaurants[restaurant.id] || false}
-                  // onLike={handleLike}
                   onClick={handleRestaurantClick}
-                  
                 />
               ))}
             </div>
@@ -216,8 +188,6 @@ const UsersRestaurant = () => {
           )}
         </div>
       )}
-
-
 
       <Footer />
     </>
