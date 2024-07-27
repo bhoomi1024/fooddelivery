@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
-
+import axios from 'axios';
+import UsersCart from '../userscart/usersCart';
 const StatusBadge = ({ status }) => {
   let bgColor, textColor;
   switch (status) {
@@ -32,13 +34,36 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const Usersorder = () => {
-  const [orders, setOrders] = useState([
-    { orderId: 1, price: 50.00, status: 'Processing' },
-    { id: 2, price: 75.50, status: 'Shipped' },
-    { id: 3, price: 25.99, status: 'Delivered' },
-  ]);
+const UsersOrder = () => {
+  const dispatch = useDispatch();
+  const [orders, setOrders] = useState([]);
+  const [latestOrder, setLatestOrder] = useState({});
 
+  const userOrder = async () => {
+    try {
+      const api = await axios.get('http://localhost:3000/api/payment/UsersOrders', {
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        withCredentials: true,
+      });
+      console.log("user order ", api.data);
+      setOrders(api.data);
+      if (api.data.length > 0) {
+        setLatestOrder(api.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching user orders: ", error);
+    }
+  };
+
+  useEffect(() => {
+    userOrder();
+    dispatch(fetchDeliveryAddresses());
+    dispatch(handlePayment());
+  }, [dispatch]);
+
+  console.log("latestOrder", latestOrder);
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -52,7 +77,6 @@ const Usersorder = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -63,7 +87,6 @@ const Usersorder = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     <StatusBadge status={order.status} />
                   </td>
-                  
                 </tr>
               ))}
             </tbody>
@@ -74,4 +97,4 @@ const Usersorder = () => {
   );
 };
 
-export default Usersorder;
+export default UsersOrder;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -8,6 +8,7 @@ import AddressPopup from './AddressPopup';
 import axios from 'axios';
 
 const UsersCart = () => {
+  const [userAddress, setUserAddress] = useState({});
   const [address, setAddress] = useState('');
   const [country, setCountry] = useState('');
   const [state, setState] = useState('');
@@ -17,29 +18,34 @@ const UsersCart = () => {
   const [isEditing, setIsEditing] = useState(false);
   const userId = localStorage.getItem('userId');
   const [error, setError] = useState(null);
-  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
+  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId === userId));
 
-
-  const handleAddressSubmit = (e) => {
-    e.preventDefault();
-    setShowCartTotal(true);
-    setShowAddressPopup(false);
-    setIsEditing(false);
-  };
-
-  const calculateTotal = (item) => item.price * item.quantity;
-  const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  useEffect(() => {
+    dispatch(fetchDeliveryAddresses());
+    dispatch((handlePayment()))
+  }, [dispatch])
 
-  const handleRemoveItem = (_id) => {
-    dispatch(removeFromCart({ _id: _id, userId: userId }));
+  const fetchDeliveryAddresses = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/addresses/deliveryaddress/${userId}`);
+      setUserAddress(response.data.fullAddress);
+    } catch (err) {
+      console.error(err);
+      if (err.response) {
+        setError(err.response.data.message);
+      } else {
+        setError('An error occurred while fetching the delivery addresses');
+      }
+    }
   };
 
   const handleDeliveryAddress = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/api/addresses/Deliveryaddress", {
+      const response = await axios.post("http://localhost:3000/api/addresses/deliveryaddress", {
+        userId,
         address,
         country,
         state,
@@ -49,6 +55,7 @@ const UsersCart = () => {
       setShowCartTotal(true);
       setShowAddressPopup(false);
       setIsEditing(false);
+      fetchDeliveryAddresses();
     } catch (err) {
       if (err.response) {
         console.error(err.response.data);
@@ -62,9 +69,8 @@ const UsersCart = () => {
 
   const handlePayment = async () => {
     try {
-      const body = { products: cartItems };
+      const body = { products: cartItems, userAddress };
       const headers = { "Content-Type": "application/json" };
-
 
       const response = await fetch("http://localhost:3000/api/payment/checkout", {
         method: "POST",
@@ -80,12 +86,12 @@ const UsersCart = () => {
       const { orderId, amount: orderAmount } = orderResponse;
 
       var options = {
-        key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
-        amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        key: "rzp_test_Jp05EcVr7cQRf3",
+        amount: orderAmount * 100,
         currency: "INR",
         name: "Foodiebuddy",
         description: "Food delivery website",
-        order_id: orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        order_id: orderId,
         handler: async function (response) {
           const paymentData = {
             orderId: response.razorpay_order_id,
@@ -94,10 +100,10 @@ const UsersCart = () => {
             signature: response.razorpay_signature,
             amount: orderAmount,
             orderItems: cartItems,
-            quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
+            shippingadress :userAddress,
+            quantity: cartItems.reduce((total, item) => total + item.quantity, 0),
           };
 
-          // Make a request to your backend to verify the payment and update the order status
           const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
             method: "POST",
             headers: {
@@ -116,7 +122,7 @@ const UsersCart = () => {
           }
         },
         prefill: {
-          name: "Bhoomi verma",
+          name: "Bhoomi Verma",
           email: "vbhoomi1024@gmail.com",
           contact: "9170302787",
         },
@@ -134,7 +140,6 @@ const UsersCart = () => {
       console.error("Payment error:", error);
     }
   };
-
 
   const handleEditAddress = () => {
     setIsEditing(true);
@@ -208,55 +213,55 @@ const UsersCart = () => {
                   <h2 className="text-xl font-semibold">Delivery Address</h2>
                   <button
                     onClick={handleEditAddress}
-                    className="text-yellow-500 hover:text-yellow-600 transition duration-300"
+                    className="bg-white border rounded-md px-3 py-2 flex items-center space-x-2 hover:bg-gray-100 transition duration-300"
                   >
-                    <MdEdit size={24} />
+                    <MdEdit size={20} />
+                    <span>Edit</span>
                   </button>
                 </div>
-                <p className="mb-4 p-3 bg-white rounded shadow">
-                  {country}, {state}, {city}, {address}
-                </p>
-                <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
-                <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
-                <button
-                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                  onClick={handlePayment}
-                >
-                  Proceed to Payment
-                </button>
+                {userAddress && (
+                  <div>
+                    <p>{userAddress.address}</p>
+                    <p>{userAddress.country}</p>
+                    <p>{userAddress.state}</p>
+                    <p>{userAddress.city}</p>
+                  </div>
+                )}
+                {error && <p className="text-red-500">{error}</p>}
+                <div className="mt-4">
+                  <button
+                    onClick={handlePayment}
+                    className="bg-blue-500 text-white rounded-md px-4 py-2 transition duration-300 hover:bg-blue-600 focus:outline-none"
+                  >
+                    Proceed to Checkout
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <h2 className="text-xl font-semibold mb-4">Ready to complete your order?</h2>
-                <button
-                  onClick={() => setShowAddressPopup(true)}
-                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
-                >
-                  Enter Delivery Address
-                </button>
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">Enter Delivery Address</h2>
+                <AddressPopup
+                  address={address}
+                  setAddress={setAddress}
+                  country={country}
+                  setCountry={setCountry}
+                  state={state}
+                  setState={setState}
+                  city={city}
+                  setCity={setCity}
+                  handleDeliveryAddress={handleDeliveryAddress}
+                  setShowAddressPopup={setShowAddressPopup}
+                  showAddressPopup={showAddressPopup}
+                  isEditing={isEditing}
+                />
               </div>
             )}
           </div>
         </div>
       </div>
-
-      <AddressPopup
-        showAddressPopup={showAddressPopup}
-        isEditing={isEditing}
-        address={address}
-        setAddress={setAddress}
-        country={country}
-        setCountry={setCountry}
-        state={state}
-        setState={setState}
-        city={city}
-        setCity={setCity}
-        handleAddressSubmit={handleDeliveryAddress}
-        setShowAddressPopup={setShowAddressPopup}
-        setIsEditing={setIsEditing}
-      />
     </>
   );
 };
 
 export default UsersCart;
+
