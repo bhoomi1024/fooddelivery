@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import chef from '../../assets/chef image.webp';
-import { ResDashboardCardData } from './ResDashboardCardData/ResDashboardCardData';
 import ResDashboardCard from '../../components/AfterLoginRestaurantCompo/ResDashboardCard';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function ResDashboard() {
   const [ResUser, setResUser] = useState([]);
   const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const resId = localStorage.getItem('restaurantId');
 
   const callResDashboard = async () => {
     try {
@@ -36,12 +39,53 @@ function ResDashboard() {
     }
   };
 
+  const getOrders = async () => {
+    try {
+        const res = await axios.get(`http://localhost:3000/api/order/getOrdersByResId/${resId}`,
+            {
+                withCredentials: true,
+            }
+        );
+        console.log(res.data);
+        setOrders(res.data);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+useEffect(() => {
+  axios.get('http://localhost:3000/api/menu/ResMenu')
+    .then(result => setMenuItems(result.data))
+    .catch(err => console.log(err));
+}, []);
+
   useEffect(() => {
     callResDashboard();
+    getOrders();
   }, []);
 
+// 1. Fetch menu data from backend
+// 2. Fetch total revenue from backend
+ const ResDashboardCardData = [
+  {
+    description: "Total Menus",
+    number: menuItems.length
+  },
+  {
+    description: "Total Revenue",
+    number: orders.reduce((a, b) => a + b.totalAmount, 0)
+  },
+  {
+    description: "Items Sold",
+    number: orders.reduce((total, order) => total + order.orderItems.reduce((c,item) => c+ item.quantity,0 ), 0)
+  },
+  {
+    description: "Total Orders",
+    number: orders.length
+  }
+ ]
+
   // Total menus, total revenue, items sold, No of orders will be fetched from backend 
-  const repeatedCard = Array.from({ length: 4 }, () => ResDashboardCardData).flat();
   
   return (
     <div className='flex flex-col items-center ml-60 mt-[78px] w-full font-poppins'>
@@ -50,7 +94,7 @@ function ResDashboard() {
       </div>
       <div className='inline-flex mt-12'>
         <div className='grid grid-cols-2 gap-8 h-72 ml-8'>
-          {repeatedCard.map((item, index) => (
+          {ResDashboardCardData.map((item, index) => (
             <ResDashboardCard
               key={index}
               number={item.number}
@@ -58,8 +102,8 @@ function ResDashboard() {
             />
           ))}
         </div>
-        <div className='size-2xl ml-16'>
-          <img src={chef} className='rounded-full w-72 h-72' alt='Chef' />
+        <div className='size-72 ml-20 -mt-16 bg-red-300'>
+          <img src={chef} className='' alt='Chef' />
         </div>
       </div>
     </div>

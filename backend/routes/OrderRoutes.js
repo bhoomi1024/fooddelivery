@@ -76,10 +76,11 @@ router.put('/updateOrderStatus/:id', AuthenticateDel, async (req, res) => {
 router.get('/getOrdersByResId/:id', Authenticate, async (req, res) => {
     try {
         const orders = await OrderModel.find({ restaurant: req.params.id })
-            .select('-__v  -deliveryman  -deliveryAddress')
+            .select('-__v   -deliveryAddress')
             .populate('orderItems.item', 'dishName price')
             .populate('user', 'ownerName')
-            .populate('paymentId', 'orderId');
+            .populate('paymentId', 'orderId')
+            .populate('deliveryman', 'ownerName');
 
         if (orders) {
             res.status(200).json(orders);
