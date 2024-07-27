@@ -4,7 +4,7 @@ import { AuthenticateUser } from './UserRoutes.js';
 
 const router = express.Router();
 
-router.post('/deliveryaddress', AuthenticateUser, async (req, res) => {
+router.post('/deliveryaddress', AuthenticateUser ,async (req, res) => {
   const { address, country, state, city } = req.body;
 
   try {
@@ -20,7 +20,7 @@ router.post('/deliveryaddress', AuthenticateUser, async (req, res) => {
 
     await FullAddress.save();
 
-    res.status(200).json(FullAddress);
+    res.status(200).json({message: "Address added",FullAddress, success:true });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
