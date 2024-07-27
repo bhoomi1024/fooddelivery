@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart, decrementQuantity, incrementQuantity } from '../../../redux/slices/cartSlice';
+import { clearActiveRestaurant, setActiveRestaurant } from '../../../redux/slices/activeRestaurantSlice';
 
 
-const AddToCartButton = ({ item }) => {
+const AddToCartButton = ({ item, restaurantId }) => {
   const userId = localStorage.getItem('userId');
-  const quantity = useSelector(state => state.cart.cartItems.find(cartItem =>cartItem.userId == userId && cartItem._id === item._id)?.quantity) || 0;  
+  const quantity = useSelector(state => state.cart.cartItems.find(cartItem => cartItem.userId == userId && cartItem._id === item._id)?.quantity) || 0;
   const [isHovered, setIsHovered] = useState(false);
-
-  const dispatch = useDispatch(); 
+  const activeRes = useSelector(state => state.activeRestaurant.activeRestaurant);
+  const dispatch = useDispatch();
 
   const handleAddToCart = () => {
 
-    dispatch(addToCart({...item, userId:userId}))
+    dispatch(addToCart({ ...item, userId: userId }))
     toast.success(`${item.dishName} added to cart!`);
+    dispatch(setActiveRestaurant(restaurantId));
   };
-
+ 
 
   const increaseItem = () => {
-    dispatch(incrementQuantity({_id:item._id, userId:userId}));
-    }
+    dispatch(incrementQuantity({ _id: item._id, userId: userId }));
+  }
 
-    const decreaseItem = () => {
-      dispatch(decrementQuantity({_id:item._id, userId:userId}));
-    }
+  const decreaseItem = () => {
+    dispatch(decrementQuantity({ _id: item._id, userId: userId }));
+  }
 
- 
+
   if (quantity === 0) {
     return (
       <button
@@ -41,6 +43,7 @@ const AddToCartButton = ({ item }) => {
           ${isHovered ? 'scale-105' : 'scale-100'}
           focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50
         `}
+        disabled={activeRes && activeRes !== restaurantId}
       >
         <span className="flex items-center justify-center">
           <svg

@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AddToCartButton from './AddToCartButton';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearActiveRestaurant } from '../../../redux/slices/activeRestaurantSlice';
 
-const RestaurantMenu = ({ menuItems, loading, error }) => {
+const RestaurantMenu = ({ menuItems, loading, error, restaurantId }) => {
+  const userId = localStorage.getItem('userId');
+  const dispatch = useDispatch();
+  const userCart = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
+  console.log(userCart);
+  useEffect(() => {
+    if (userCart?.length === 0) {
+      dispatch(clearActiveRestaurant())
+    }
+  }, [])
+
   if (loading) {
     return <p className="text-center">Loading menu items...</p>;
   }
@@ -27,7 +39,7 @@ const RestaurantMenu = ({ menuItems, loading, error }) => {
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold text-yellow-600">Rs {item.price.toFixed(2)}</p>
               {item.inStock ? (
-                <AddToCartButton item={item} />
+                <AddToCartButton item={item} restaurantId = {restaurantId}/>
                 
               ) : (
                 <p className="text-red-600 font-semibold">Not Available</p>
