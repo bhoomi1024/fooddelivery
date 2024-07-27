@@ -18,7 +18,11 @@ const ResEditMenuForm = ({ show, handleClose,editId }) => {
     useEffect(() => {
         
            if(loadData){
-            axios.get(`http://localhost:3000/api/menu/ResMenu/${editId}`)
+            axios.get(`http://localhost:3000/api/menu/EditMenu/${editId}`,
+                {
+                    withCredentials:true
+                }
+            )
             .then(result => {
                 const { dishName, price, description, cuisineName, image } = result.data;
                 setDishName(dishName);

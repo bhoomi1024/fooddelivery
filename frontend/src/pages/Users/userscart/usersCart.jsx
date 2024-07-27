@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../../../components/AfterLoginUsersComp/usersNavbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -8,7 +8,6 @@ import AddressPopup from './AddressPopup';
 import axios from 'axios';
 
 const UsersCart = () => {
-  const [userAddress, setUserAddress] = useState({});
   const [address, setAddress] = useState('');
   const [country, setCountry] = useState('');
   const [state, setState] = useState('');
@@ -16,36 +15,80 @@ const UsersCart = () => {
   const [showCartTotal, setShowCartTotal] = useState(false);
   const [showAddressPopup, setShowAddressPopup] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const userId = localStorage.getItem('userId');
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [userAddress, setUserAddress] = useState([]);
+  const restaurant = useSelector(state => state.activeRestaurant.activeRestaurant);
+
+
   const [error, setError] = useState(null);
-  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId === userId));
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  useEffect(() => {
-    dispatch(fetchDeliveryAddresses());
-    dispatch((handlePayment()))
-  }, [dispatch])
+  const userId = localStorage.getItem('userId');
+  const cartItems = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId));
 
-  const fetchDeliveryAddresses = async () => {
+  // Create new order
+  const createOrder = async (orderData) => {
+    try {
+      const response = await axios.post("http://localhost:3000/api/order/newOrder", orderData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(response);
+      if (response.status === 200) {
+        console.log('Order created successfully');
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error creating order:', err);
+      setError('Failed to create order');
+    }
+  }
+
+
+  //Fetch users addresses
+  const fetchUserAddresses = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/api/addresses/deliveryaddress/${userId}`);
-      setUserAddress(response.data.fullAddress);
-    } catch (err) {
-      console.error(err);
-      if (err.response) {
-        setError(err.response.data.message);
+      console.log(response.data);
+      if (response.status === 200) {
+        setUserAddress(response.data);
       } else {
-        setError('An error occurred while fetching the delivery addresses');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+    } catch (err) {
+      console.error('Error fetching address:', err);
+      setError('Failed to fetch address');
     }
+  }
+  useEffect(() => {
+    fetchUserAddresses();
+  }
+    , []);
+
+
+
+  const handleAddressSubmit = (e) => {
+    e.preventDefault();
+    setShowCartTotal(true);
+    setShowAddressPopup(false);
+    setIsEditing(false);
+  };
+
+  const calculateTotal = (item) => item.price * item.quantity;
+  const cartTotal = cartItems.reduce((total, item) => total + calculateTotal(item), 0);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleRemoveItem = (_id) => {
+    dispatch(removeFromCart({ _id: _id, userId: userId }));
   };
 
   const handleDeliveryAddress = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost:3000/api/addresses/deliveryaddress", {
-        userId,
         address,
         country,
         state,
@@ -55,7 +98,7 @@ const UsersCart = () => {
       setShowCartTotal(true);
       setShowAddressPopup(false);
       setIsEditing(false);
-      fetchDeliveryAddresses();
+      fetchUserAddresses();
     } catch (err) {
       if (err.response) {
         console.error(err.response.data);
@@ -69,8 +112,9 @@ const UsersCart = () => {
 
   const handlePayment = async () => {
     try {
-      const body = { products: cartItems, userAddress };
+      const body = { products: cartItems };
       const headers = { "Content-Type": "application/json" };
+
 
       const response = await fetch("http://localhost:3000/api/payment/checkout", {
         method: "POST",
@@ -86,12 +130,12 @@ const UsersCart = () => {
       const { orderId, amount: orderAmount } = orderResponse;
 
       var options = {
-        key: "rzp_test_Jp05EcVr7cQRf3",
-        amount: orderAmount * 100,
+        key: "rzp_test_Jp05EcVr7cQRf3", // Enter the Key ID generated from the Dashboard
+        amount: orderAmount * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         currency: "INR",
         name: "Foodiebuddy",
         description: "Food delivery website",
-        order_id: orderId,
+        order_id: orderId, // This is a sample Order ID. Pass the id obtained in the response of Step 1
         handler: async function (response) {
           const paymentData = {
             orderId: response.razorpay_order_id,
@@ -100,10 +144,10 @@ const UsersCart = () => {
             signature: response.razorpay_signature,
             amount: orderAmount,
             orderItems: cartItems,
-            shippingadress :userAddress,
-            quantity: cartItems.reduce((total, item) => total + item.quantity, 0),
+            quantity: cartItems.reduce((total, item) => total + item.quantity, 0), // calculate total quantity
           };
 
+          // Make a request to your backend to verify the payment and update the order status
           const api = await fetch("http://localhost:3000/api/payment/verify-payment", {
             method: "POST",
             headers: {
@@ -115,14 +159,22 @@ const UsersCart = () => {
           const apiResponse = await api.json();
           console.log("razorpay res ", apiResponse);
           if (apiResponse.success) {
-            clearCart();
+            const orderData = {
+              orderItems: cartItems.map((item) => ({ item: item._id, quantity: item.quantity })), // map cart items to order items
+              totalAmount: orderAmount,
+              paymentId: apiResponse.orderConfirm._id,
+              deliveryAddress: selectedAddress,
+              restaurant: restaurant,
+            };
+            await createOrder(orderData);
+            dispatch(clearCart({ userId: userId }));
             navigate("/UsersOrders");
           } else {
             console.error("Payment verification failed");
           }
         },
         prefill: {
-          name: "Bhoomi Verma",
+          name: "Bhoomi verma",
           email: "vbhoomi1024@gmail.com",
           contact: "9170302787",
         },
@@ -141,10 +193,13 @@ const UsersCart = () => {
     }
   };
 
+
   const handleEditAddress = () => {
     setIsEditing(true);
     setShowAddressPopup(true);
   };
+
+
 
   return (
     <>
@@ -207,61 +262,95 @@ const UsersCart = () => {
             </table>
           </div>
           <div className="md:w-1/3">
-            {showCartTotal ? (
+
+          {/* //Display user addresses */}
+           {/* //Display user addresses */}
+           {
+              userAddress.length > 0 && (
+                <div className="bg-gray-50 p-6 rounded-lg mb-6">
+                  <div className="flex flex-col mb-4 gap-y-2">
+                    <h2 className="text-xl font-semibold">Select any delivery Address</h2>
+                    {userAddress.map((address) => (
+                      <div key={address._id} className="flex gap-x-2 items-center mb-4">
+                        <div>
+                          <input type="radio" name="address"
+                            className='size-5'
+                            onClick={() => {
+                              setAddress(address.address);
+                              setCountry(address.country);
+                              setState(address.state);
+                              setCity(address.city);
+                              setShowCartTotal(true);
+                              setSelectedAddress(address._id);
+                            }}
+                          />
+                        </div>
+                        <p className="mb-4 p-3 bg-white rounded shadow ">
+                          {address.country}, {address.state}, {address.city}, {address.address}
+                        </p>
+
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
+            <div className="bg-gray-50 p-6 rounded-lg mb-6">
+              <button
+                onClick={() => setShowAddressPopup(true)}
+                className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+              >
+                Enter New Delivery Address
+              </button>
+            </div>
+
+              {/*Show cart total only if user has selected an address and let them proceed to payment */}
+            {showCartTotal && (
               <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <div className="flex justify-between items-center mb-4">
+                {/* We need to move this button */}
+                {/* <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold">Delivery Address</h2>
                   <button
                     onClick={handleEditAddress}
-                    className="bg-white border rounded-md px-3 py-2 flex items-center space-x-2 hover:bg-gray-100 transition duration-300"
+                    className="text-yellow-500 hover:text-yellow-600 transition duration-300"
                   >
-                    <MdEdit size={20} />
-                    <span>Edit</span>
+                    <MdEdit size={24} />
                   </button>
-                </div>
-                {userAddress && (
-                  <div>
-                    <p>{userAddress.address}</p>
-                    <p>{userAddress.country}</p>
-                    <p>{userAddress.state}</p>
-                    <p>{userAddress.city}</p>
-                  </div>
-                )}
-                {error && <p className="text-red-500">{error}</p>}
-                <div className="mt-4">
-                  <button
-                    onClick={handlePayment}
-                    className="bg-blue-500 text-white rounded-md px-4 py-2 transition duration-300 hover:bg-blue-600 focus:outline-none"
-                  >
-                    Proceed to Checkout
-                  </button>
-                </div>
+                </div> */}
+                <p className="mb-4 p-3 bg-white rounded shadow">
+                  {country}, {state}, {city}, {address}
+                </p>
+                <h2 className="text-xl font-semibold mb-4">Cart Totals</h2>
+                <p className="mb-4">Total: Rs {cartTotal.toFixed(2)}</p>
+                <button
+                  className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition duration-300"
+                  onClick={handlePayment}
+                >
+                  Proceed to Payment
+                </button>
               </div>
-            ) : (
-              <div className="bg-gray-50 p-6 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">Enter Delivery Address</h2>
-                <AddressPopup
-                  address={address}
-                  setAddress={setAddress}
-                  country={country}
-                  setCountry={setCountry}
-                  state={state}
-                  setState={setState}
-                  city={city}
-                  setCity={setCity}
-                  handleDeliveryAddress={handleDeliveryAddress}
-                  setShowAddressPopup={setShowAddressPopup}
-                  showAddressPopup={showAddressPopup}
-                  isEditing={isEditing}
-                />
-              </div>
-            )}
+            ) }
           </div>
         </div>
       </div>
+
+      <AddressPopup
+        showAddressPopup={showAddressPopup}
+        isEditing={isEditing}
+        address={address}
+        setAddress={setAddress}
+        country={country}
+        setCountry={setCountry}
+        state={state}
+        setState={setState}
+        city={city}
+        setCity={setCity}
+        handleAddressSubmit={handleDeliveryAddress}
+        setShowAddressPopup={setShowAddressPopup}
+        setIsEditing={setIsEditing}
+      />
     </>
   );
 };
 
 export default UsersCart;
-

@@ -7,16 +7,16 @@ import UserRoutes from './routes/UserRoutes.js';
 import DelRoutes from './routes/DelRoutes.js'
 import cookieParser from "cookie-parser";
 import menuRoutes from './routes/menuRoutes.js'; // Adjust path as needed
-import paymentRouter from './routes/payment.js'
+import paymentRouter from './routes/paymentRoutes.js'
 import addressRoutes from './routes/AddressRoutes.js'
-//import Stripe from "stripe";
+import orderRoutes from './routes/OrderRoutes.js'
 
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-//const stripe = Stripe('sk_test_51O7fULSHZlt3LJGtFPhRuWy62jcDcQp22MnrWff4hXwmDNIKcM0zCMgQZntpyY2OBVTlWlqXLTwtcqqGRgzo7w5U005KYw2TIP')
+
 app.use(express.json());
 app.use(cors({
     origin: "http://localhost:5173",
@@ -34,6 +34,7 @@ app.use('/api/menu', menuRoutes);
 app.use('/api/payment',paymentRouter)
 //DelAddres Router
 app.use('/api/addresses', addressRoutes);
+app.use('/api/order',orderRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {

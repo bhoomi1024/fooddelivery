@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const AddressSchema = new Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } ,
   country: {
     type: String,
     required: true,
@@ -19,14 +20,9 @@ const AddressSchema = new Schema({
     type: String,
     required: true,
   },
-  user:{
-    type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-}
-});
 
+});
 
 const DeliveryAddressModel = model('DeliveryAddress', AddressSchema);
 
 export default DeliveryAddressModel;
-

@@ -70,6 +70,22 @@ router.get('/ResMenu/:resId' ,AuthenticateUser,async (req, res) => {
 
 
 
+// Route to get restaurant menu by restaurant ID
+router.get('/EditMenu/:editId' ,Authenticate,async (req, res) => {
+  try {
+    const { editId } = req.params;
+    const menuItem = await MenuItemModel.findById(editId);
+    if (!menuItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+    res.status(200).json(menuItem);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch menu item' });
+  }
+});
+
+
+
 // Route to update a menu item by ID
 router.patch('/ResMenu/:id',Authenticate ,upload.single('image'), async (req, res) => {
   const { id } = req.params;
@@ -105,19 +121,7 @@ router.patch('/ResMenu/:id',Authenticate ,upload.single('image'), async (req, re
   }
 });
 
-// Route to get a menu item by ID
-router.get('/ResMenu/:id',Authenticate ,async (req, res) => {
-  try {
-    const { id } = req.params;
-    const menuItem = await MenuItemModel.findById(id);
-    if (!menuItem) {
-      return res.status(404).json({ error: 'Menu item not found' });
-    }
-    res.status(200).json(menuItem);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch menu item' });
-  }
-});
+
 
 // Route to delete a menu Item
 router.delete('/DeleteMenu/:id', Authenticate,async (req, res) => {

@@ -24,6 +24,7 @@ function ResDashboard() {
       }
   
       const data = await res.json();
+      localStorage.setItem('restaurantId', data._id);
       console.log(data);
       setResUser(data);
       if (!data) {
