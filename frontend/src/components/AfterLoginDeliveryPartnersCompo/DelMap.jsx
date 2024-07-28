@@ -1,124 +1,117 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
-import BackgroundImage from '../../assets/profile.jpg';
-
-// Fix the default icon issue in React Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+import 'leaflet/dist/leaflet.css';
 
 const DelMap = () => {
-  const [vehiclePosition, setVehiclePosition] = useState([28.6139, 77.2090]);
-  const [customerPosition, setCustomerPosition] = useState(null); // State for customer position
-  const markerRef = useRef(null);
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [coordinates, setCoordinates] = useState({
+    origin: [20.5937, 78.9629],
+    destination: [19.5937, 68.9629]
+  });
+  const [mapCenter, setMapCenter] = useState([20.5937, 78.9629]);
 
-  const SetMapCenter = ({ position }) => {
-    const map = useMap();
-    useEffect(() => {
-      map.setView(position, map.getZoom());
-    }, [position, map]);
-    
-    return null;
-  };
+  const redIcon = new L.Icon({
+    iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const blueIcon = new L.Icon({
+    iconUrl: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userCoords = [position.coords.latitude, position.coords.longitude];
-        setVehiclePosition(userCoords);
-      },
-      (error) => {
-        console.error('Error getting user location', error);
-      }
-    );
-
-    const fetchGpsData = async () => {
+    const fetchOriginAddress = async (lat, lng) => {
       try {
-        const response = await axios.get('http://localhost:5000/api/gps/vehicle1');
-        const { latitude, longitude } = response.data;
-        setVehiclePosition([latitude, longitude]);
+        const response = await axios.get('http://localhost:3000/api/mapquest/geocoding/v1/reverse', {
+          params: {
+            key: '6n8mOkjIr008hDT2QOx9Vs9NNsAmCWEz',
+            location: `${lat},${lng}`
+          }
+        });
+        const address = response.data.results[0].locations[0].street + ", " +
+                        response.data.results[0].locations[0].adminArea5 + ", " +
+                        response.data.results[0].locations[0].adminArea3 + ", " +
+                        response.data.results[0].locations[0].adminArea1;
+        setOrigin(address);
       } catch (error) {
-        console.error('Error fetching GPS data', error);
+        console.error('Error fetching origin address', error);
       }
     };
 
-    fetchGpsData();
-    const interval = setInterval(fetchGpsData, 5000);
-    
-    return () => clearInterval(interval);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setCoordinates((prevCoords) => ({
+          ...prevCoords,
+          origin: [latitude, longitude]
+        }));
+        setMapCenter([latitude, longitude]);
+        fetchOriginAddress(latitude, longitude);
+      });
+    }
   }, []);
 
-  useEffect(() => {
-    if (markerRef.current) {
-      markerRef.current.openPopup();
-    }
-  }, [vehiclePosition]);
-
-  const handleCustomerInput = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const latitude = parseFloat(e.target.latitude.value);
-    const longitude = parseFloat(e.target.longitude.value);
-    if (!isNaN(latitude) && !isNaN(longitude)) {
-      setCustomerPosition([latitude, longitude]);
+    try {
+      const destinationResponse = await axios.get('http://localhost:3000/api/mapquest/geocoding/v1/address', {
+        params: {
+          key: '6n8mOkjIr008hDT2QOx9Vs9NNsAmCWEz',
+          location: destination
+        }
+      });
+
+      const destinationCoords = destinationResponse.data.results[0].locations[0].latLng;
+
+      setCoordinates((prevCoords) => ({
+        ...prevCoords,
+        destination: [destinationCoords.lat, destinationCoords.lng]
+      }));
+    } catch (error) {
+      console.error('Error fetching coordinates', error);
     }
-    e.target.reset(); // Clear input fields
   };
 
   return (
-    <div className="bg-gradient-to-r from-white via-yellow-100 to-white ml-60 mt-[78px] w-full h-screen flex items-center justify-center relative">
-      <div className="absolute inset-0">
-        <img
-          src={BackgroundImage}
-          alt="Background"
-          className="w-full h-full object-cover blur-sm opacity-30"
-        />
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ width: '70%', height: '70%', position: 'relative' }}>
+        <form onSubmit={handleFormSubmit} style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+            <input
+              type="text"
+              value={origin}
+              placeholder="Origin"
+              readOnly
+              style={{ marginRight: '10px' }}
+            />
+            <input
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              placeholder="Enter destination"
+              style={{ marginRight: '10px' }}
+            />
+            <button type="submit">Get Directions</button>
+          </div>
+        </form>
+        <MapContainer center={mapCenter} zoom={5} style={{ width: '100%', height: '100%' }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <Marker position={coordinates.origin} icon={redIcon} />
+          <Marker position={coordinates.destination} icon={blueIcon} />
+          <Polyline positions={[coordinates.origin, coordinates.destination]} />
+        </MapContainer>
       </div>
-
-      <form onSubmit={handleCustomerInput} className="absolute top-4 left-4 z-10">
-        <input
-          type="text"
-          name="latitude"
-          placeholder="Customer Latitude"
-          required
-          className="mr-2 p-1 rounded"
-        />
-        <input
-          type="text"
-          name="longitude"
-          placeholder="Customer Longitude"
-          required
-          className="mr-2 p-1 rounded"
-        />
-        <button type="submit" className="p-1 bg-yellow-300 rounded">Add Customer</button>
-      </form>
-
-      <MapContainer
-        center={vehiclePosition}
-        zoom={15}
-        className="h-[calc(100vh-200px)] w-[calc(145vh)]"
-      >
-        <SetMapCenter position={vehiclePosition} />
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <Marker position={vehiclePosition} ref={markerRef}>
-          <Popup>Vehicle is here</Popup>
-        </Marker>
-        {customerPosition && ( // Add marker for customer if position is set
-          <Marker position={customerPosition}>
-            <Popup>Customer is here</Popup>
-          </Marker>
-        )}
-      </MapContainer>
     </div>
   );
-}
+};
 
 export default DelMap;
