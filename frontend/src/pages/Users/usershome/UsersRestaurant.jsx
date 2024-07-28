@@ -91,23 +91,21 @@ const UsersRestaurant = () => {
       applyFilters(searchTerm, value);
     }
   };
-
   const applyFilters = (search, ratingFilter) => {
     const filtered = restaurants.filter((restaurant) => {
-      const restaurantNameFirstLetter = restaurant.restaurantName.charAt(0).toLowerCase();
-      const searchFirstLetter = search.charAt(0).toLowerCase();
-      const matchesSearchTerm = restaurantNameFirstLetter === searchFirstLetter || search === '';
-      const matchesCuisine =
-        filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisineName);
+      const matchesSearchTerm = restaurant.restaurantName.toLowerCase().includes(search.toLowerCase());
+      const matchesCuisine = filters.cuisine.length === 0 || filters.cuisine.includes(restaurant.cuisineName);
       const matchesRating = ratingFilter === null || restaurant.rating >= ratingFilter;
-
+  
       return matchesSearchTerm && matchesCuisine && matchesRating;
     });
-
+  
     setFilteredRestaurants(filtered);
     setShowFilters(false);
   };
+  
 
+  
   const closeFilters = () => {
     setShowFilters(false);
     setRating4PlusSelected(false);
