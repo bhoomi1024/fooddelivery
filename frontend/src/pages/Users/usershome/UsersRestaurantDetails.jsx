@@ -6,6 +6,7 @@ import RestaurantMenu from './RestaurantMenu';
 const UsersRestaurantDetail = ({ restaurant, onClose }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [menuItems, setMenuItems] = useState([]);
+  const [cuisineNames, setCuisineNames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -13,7 +14,7 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
     const fetchMenuItems = async () => {
       try {
         setLoading(true);
-        
+
         const response = await axios.get(`http://localhost:3000/api/menu/ResMenu/${restaurant._id}`, {
           withCredentials: true,
           headers: {
@@ -21,12 +22,16 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (response.status === 200) {
           if (Array.isArray(response.data)) {
             setMenuItems(response.data);
+            const uniqueCuisines = [...new Set(response.data.map(item => item.cuisineName))];
+            setCuisineNames(uniqueCuisines);
           } else if (response.data && Array.isArray(response.data.menu)) {
             setMenuItems(response.data.menu);
+            const uniqueCuisines = [...new Set(response.data.menu.map(item => item.cuisineName))];
+            setCuisineNames(uniqueCuisines);
           } else {
             setError('Received invalid data format for menu items');
           }
@@ -47,11 +52,11 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
   if (!restaurant) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 ">
+    <div className="fixed inset-0 bg-black bg-opacity-50">
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="bg-white w-full max-w-4xl rounded-lg shadow-xl overflow-hidden">
           <div className="relative">
-            <button 
+            <button
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
               onClick={onClose}
             >
@@ -63,7 +68,9 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
             <div className="p-8">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-extrabold mb-2 text-gray-800">{restaurant.name}</h1>
-                <p className="text-xl text-gray-600 mb-4">{restaurant.cuisine}</p>
+                <div className="text-xl text-gray-600 mb-4">
+                  {cuisineNames.length > 0 ? cuisineNames.join(', ') : 'No cuisine available'}
+                </div>
                 <div className="flex items-center justify-center mb-4">
                   <span className="text-yellow-400 mr-2">
                     <svg className="w-6 h-6 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
