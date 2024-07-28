@@ -210,5 +210,30 @@ router.get('/Restaurants',AuthenticateUser, async (req,res) => {
   }
 })
 
+// Route to open or close restaurant
+router.patch('/updateStatus/:restaurantId',Authenticate, async (req, res) => {
+  try {
+      const { restaurantId } = req.params;
+      const {status} = req.body;
+      if (!restaurantId) {
+          return res.status(400).json({ error: 'Restaurant ID is required' });
+      }
+      
+      const restaurant = await RestaurantModel.findById(restaurantId);
+      
+      if (!restaurant) {
+          return res.status(404).json({ error: 'Restaurant not found' });
+      }
+      
+      status === "Open" ? restaurant.isOpen = true : restaurant.isOpen = false;
+      await restaurant.save();
+      
+      res.status(200).json({ message: 'Status updated successfully' });
+  } catch (error) {
+      console.error('Error updating status:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 export default router;

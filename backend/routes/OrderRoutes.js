@@ -76,10 +76,11 @@ router.put('/updateOrderStatus/:id', AuthenticateDel, async (req, res) => {
 router.get('/getOrdersByResId/:id', Authenticate, async (req, res) => {
     try {
         const orders = await OrderModel.find({ restaurant: req.params.id })
-            .select('-__v  -deliveryman  -deliveryAddress')
+            .select('-__v   -deliveryAddress')
             .populate('orderItems.item', 'dishName price')
             .populate('user', 'ownerName')
-            .populate('paymentId', 'orderId');
+            .populate('paymentId', 'orderId')
+            .populate('deliveryman', 'ownerName');
 
         if (orders) {
             res.status(200).json(orders);
@@ -109,4 +110,24 @@ router.get('/getOrdersByDelId/:id', AuthenticateDel, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+// Route to get orders by user Id
+router.get('/getOrdersByUserId', AuthenticateUser, async (req, res) => {
+    try {
+        const orders = await OrderModel.find({ user: req.UserId })
+            .select('-__v -user -deliveryAddress')
+            .populate('paymentId', 'orderId')
+            .populate('restaurant', 'restaurantName')
+            .populate('orderItems.item', 'dishName ');
+
+        if (orders) {
+            res.status(200).json(orders);
+        } else {
+            res.status(404).json({ error: 'Orders not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 export default router;

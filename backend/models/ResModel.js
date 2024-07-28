@@ -12,6 +12,7 @@ const RestaurantSchema = new Schema({
     address: { type: String, required: true },
     countryName: { type: String, required: true },
     stateName: { type: String, required: true },
+    isOpen: { type: Boolean, default: true },
     menu: [
         {
             type: mongoose.Schema.Types.ObjectId,

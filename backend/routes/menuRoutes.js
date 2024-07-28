@@ -178,4 +178,13 @@ router.get('/ResMenu', Authenticate, async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch menu items' });
   }
 });
+//router to fetch all the usinque names of cuisine 
+router.get('/cuisineNames', AuthenticateUser, async (req, res) => {
+  try {
+    const cuisineNames = await MenuItemModel.distinct('cuisineName');
+    res.status(200).json(cuisineNames);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch cuisine names' });
+  }
+});
 export default router;
