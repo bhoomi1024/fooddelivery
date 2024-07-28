@@ -12,6 +12,7 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import cartReducer from './slices/cartSlice';
+import activeRestaurantReducer from './slices/activeRestaurantSlice';
 
 const persistConfig = {
   key: 'root',
@@ -21,6 +22,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   cart: cartReducer,
+  activeRestaurant: activeRestaurantReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

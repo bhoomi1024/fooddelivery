@@ -26,6 +26,7 @@ const RestaurantMenuCard = (props) => {
 
         try {
             const response = await fetch(`http://localhost:3000/api/menu/toggleStock/${props.cardId}`, {
+                credentials: 'include',
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

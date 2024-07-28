@@ -24,7 +24,15 @@ const RestaurantCard = ({ restaurant,  onLike, onClick }) => {
           restaurantId={restaurant.id} 
         />
       </div>
-      <h3 className="text-xl font-bold mb-2">{restaurant.restaurantName}</h3>
+      <div className='flex justify-between items-center'>
+        <h3 className="text-xl font-semibold mb-2">{restaurant.restaurantName}</h3>
+
+
+        <p className={`text-gray-600 mb-2 font-poppins mr-2 ${restaurant?.isOpen?"text-green-600":"text-neutral-500"}`}>
+        {restaurant?.isOpen?"Open":"Closed"}
+        </p>
+      </div>
+
       <p className="text-gray-600 mb-2">{restaurant.cuisineName}</p>
       <p className="text-gray-600 mb-2">{'⭐'.repeat(restaurant.rating)}</p>
     </div>

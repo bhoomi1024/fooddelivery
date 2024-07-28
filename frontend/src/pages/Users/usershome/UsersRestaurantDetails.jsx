@@ -108,6 +108,7 @@ const UsersRestaurantDetail = ({ restaurant, onClose }) => {
                     menuItems={menuItems}
                     loading={loading}
                     error={error}
+                    restaurantId = {restaurant._id}
                   />
                 )}
               </div>
