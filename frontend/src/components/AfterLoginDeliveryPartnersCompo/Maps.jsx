@@ -9,7 +9,7 @@ const icon = L.icon({
   iconSize: [38, 38],
 });
 
-const position = [51.505, -0.09]; // Default center position
+const position = [20.5937, 78.9629]; // Default center position
 
 function ResetCenterView({ originPosition, destinationPosition }) {
   const map = useMap();
