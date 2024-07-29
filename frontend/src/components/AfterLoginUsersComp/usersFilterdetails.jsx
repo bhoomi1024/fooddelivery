@@ -36,7 +36,7 @@ const FilterOptions = ({ filters, handleFilterChange, applyFilters, closeFilters
       
       <button
         className="bg-gray-800 text-white px-4 py-2 rounded-full font-medium text-sm uppercase tracking-wide hover:bg-gray-700 transition-colors duration-300"
-        onClick={closeFilters}
+        onClick={applyFilters}
       >
         Apply Filters
       </button>
