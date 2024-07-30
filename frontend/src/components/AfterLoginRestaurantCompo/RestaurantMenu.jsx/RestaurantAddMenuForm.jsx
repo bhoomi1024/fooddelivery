@@ -14,36 +14,7 @@ const Modal = ({ show, handleClose, addMenuItem }) => {
   const [cuisineName, setCuisineName] = useState("");
   
   const navigate = useNavigate();
-  const callResAddMenu = async () => {
-    try {
-      const res = await fetch('http://localhost:3000/api/menu/ResMenu', { // Update with the correct backend URL and port
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-            "Content-Type": "multipart/form-data"
-        },
-        credentials: "include"
-      });
-  
-      if (res.status !== 200) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
-  
-      const data = await res.json();
-      console.log(data);
-      
-      if (!data) {
-        throw new Error("No data received");
-      }
-    } catch (err) {
-      console.log(err);
-      navigate('/ResLogin');
-    }
-  };
-  useEffect(() => {
-    callResAddMenu();
-  }, []);
-
+ 
   const animation = useSpring({
     opacity: show ? 1 : 0,
     transform: show ? 'translateY(0%)' : 'translateY(-50%)',
@@ -78,9 +49,9 @@ const Modal = ({ show, handleClose, addMenuItem }) => {
       }
 
       toast.success("Item added successfully!");
-      addMenuItem(response.data); // Add this line to update the parent component
+      // addMenuItem(response.data); // Add this line to update the parent component
       handleClose();
-      navigate('/RestaurantLayout/ResMenu');
+      navigate(0);
     } catch (error) {
       toast.error("Item could not be added!");
       console.error(error);
