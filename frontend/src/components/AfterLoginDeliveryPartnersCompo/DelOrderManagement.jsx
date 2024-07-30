@@ -1,106 +1,136 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Grid, Typography, Modal, Box, Button, Card, CardContent } from '@mui/material';
 import BackgroundImage from '../../assets/food.jpeg'; // Ensure the path is correct
+import axios from 'axios';
+import { RxCross2 } from "react-icons/rx";
 
 const DelOrderManagement = () => {
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [orders, setOrders] = useState([
-    { id: '001', customerName: 'John Doe', details: '2x Pizza, 1x Coke', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    { id: '002', customerName: 'Jane Smith', details: '1x Burger, 2x Fries', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    { id: '001', customerName: 'John Doe', details: '2x Pizza, 1x Coke', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    { id: '002', customerName: 'Jane Smith', details: '1x Burger, 2x Fries', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    { id: '003', customerName: 'Alice Johnson', details: '3x Sushi, 1x Ramen', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    { id: '003', customerName: 'Alice Johnson', details: '3x Sushi, 1x Ramen', address: 'Chaman Singh Bagh Road, Ballia, Uttar Pradesh', contact: '9170302787' },
-    // Add more orders as needed...
-  ]);
 
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
+  const [orders, setOrders] = useState([]);
+
+  const getOrders = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/order/getAllOrders`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleClose = () => {
-    setSelectedOrder(null);
+  useEffect(() => {
+    getOrders();
+  }, []);
+
+
+
+  const handleAccept = async (orderId) => {
+    try {
+
+      const response = await axios.put(`http://localhost:3000/api/order/assignDeliveryMan/${orderId}`, {
+        withCredentials: true,
+      });
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+
+      }
+      getOrders();
+    } catch (error) {
+      console.log(error);
+    }
+
   };
 
-  const handleAccept = () => {
-    console.log(`Order ${selectedOrder.id} accepted`);
-    setSelectedOrder(null);
-  };
 
-  const handleReject = () => {
-    console.log(`Order ${selectedOrder.id} rejected`);
-    setOrders((prevOrders) => prevOrders.filter((order) => order.id !== selectedOrder.id));
-    setSelectedOrder(null);
-  };
 
-  const OrderBox = ({ order, onClick }) => (
-    <Card
-      className="bg-yellow-50 shadow-lg hover:shadow-xl transition-shadow h-32 flex items-center justify-center cursor-pointer"
-      onClick={() => onClick(order)}
-    >
-      <CardContent className="text-center">
-        <Typography variant="h6" className="text-yellow-600 font-bold">
-          Order #{order.id}
-        </Typography>
-        <Typography variant="body2" className="text-gray-800">
-          {order.customerName}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
+
 
   return (
-    <div className="bg-gradient-to-r from-yellow-100 to-white ml-60 mt-20 w-full font-poppins h-screen flex items-center justify-center relative">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src={BackgroundImage}
-          alt="Background"
-          className="w-full h-full object-cover blur-sm opacity-30"
-        />
+    <div  className='bg-gray-100 ml-60 mt-[78px] min-h-screen pt-4 w-full font-poppins'>
+      <div className=' flex justify-center items-center font-semibold text-lg'>
+        Your Orders        
       </div>
+      {
+        orders?.map((order) => (
 
-      <div className="w-full z-10">
-        <Typography variant="h4" className="text-yellow-600 font-bold text-center mb-4">
-          Orders
-        </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
-          {orders.map((order) => (
-            <Grid item xs={12} sm={6} md={4} key={order.id}>
-              <OrderBox order={order} onClick={handleOrderClick} />
-            </Grid>
-          ))}
-        </Grid>
-      </div>
+          <div className='flex flex-col bg-white shadow-md rounded-md font-poppins mx-8 my-6 pt-4'>
 
-      <Modal open={!!selectedOrder} onClose={handleClose}>
-        <Box className="bg-white p-4 rounded-lg shadow-lg w-1/3 mx-auto mt-24 z-20">
-          <Typography variant="h6" className="text-yellow-600 font-bold text-center mb-4">
-            Order #{selectedOrder?.id}
-          </Typography>
-          <Typography variant="body1" className="text-gray-800 mb-2">
-            <strong>Customer Name:</strong> {selectedOrder?.customerName}
-          </Typography>
-          <Typography variant="body1" className="text-gray-800 mb-2">
-            <strong>Details:</strong> {selectedOrder?.details}
-          </Typography>
-          <Typography variant="body1" className="text-gray-800 mb-2">
-            <strong>Address:</strong> {selectedOrder?.address}
-          </Typography>
-          <Typography variant="body1" className="text-gray-800 mb-4">
-            <strong>Contact:</strong> {selectedOrder?.contact}
-          </Typography>
-          <div className="flex justify-around">
-            <Button variant="contained" color="success" onClick={handleAccept}>
-              Accept
-            </Button>
-            <Button variant="contained" color="error" onClick={handleReject}>
-              Reject
-            </Button>
+            <div className=' flex justify-center items-center font-semibold text-lg'>
+              ID : {order?.paymentId?.orderId}
+              {/* //Change this to payment order id */}
+            </div>
+
+            <div className='flex justify-between px-4 '>
+
+              {/* //Customer details */}
+              <div className='flex flex-col m-4 p-2 gap-y-3'>
+                <div>
+                  Customer's Name : {order?.user?.ownerName}
+                </div>
+                <div>
+                  Customer's Phone : {order?.user?.phone}
+                </div>
+                <div className=' flex  items-center'>
+                  <p>Customer's Address : </p>
+                  {<p className=" p-3 text-wrap ">
+                    {order?.deliveryAddress?.address}, {order?.deliveryAddress?.city}, {order?.deliveryAddress?.state},{order?.deliveryAddress?.country}
+                  </p>}
+                </div>
+              </div>
+
+              {/* //Restaurant details */}
+              <div className='flex flex-col m-4 p-2 gap-y-3'>
+                <div>
+                  Restaurant's Name : {order?.restaurant?.restaurantName}
+                </div>
+                <div>
+                  Restaurant's Phone : {order?.restaurant?.phone}
+                </div>
+                <div className=' flex  items-center'>
+                  <p>Restaurant's Address : </p>
+                  {<p className=" p-3 text-wrap ">
+                    {order?.restaurant?.address}, {order?.restaurant?.city}, {order?.restaurant?.stateName},{order?.restaurant?.countryName}
+                  </p>}
+                </div>
+              </div>
+
+              {/* //Order details */}
+              <div className='flex flex-col justify-between  m-4 p-2 '>
+                {
+                  order?.orderItems?.map((item) => (
+                    <>
+                      <div className='flex justify-between w-60 px-2'>
+                        <span className='flex gap-x-1 items-center '>
+                          {item?.quantity}
+                          <RxCross2 size={14} />
+                          {item?.item?.dishName}
+                        </span>
+
+                      </div>
+                    </>
+                  ))
+                }
+
+                <div>
+                  <button className='bg-green-500 text-white rounded-md p-2 mb-2' onClick={() => handleAccept(order._id)}>Accept Order</button>
+                </div>
+
+              </div>
+
+
+            </div>
+
           </div>
-        </Box>
-      </Modal>
+
+
+        )
+        )
+      }
     </div>
   );
 };

@@ -53,7 +53,7 @@ const Menu = () => {
   }, []);
 
   return (
-    <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins'>
+    <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins min-h-screen'>
       <div className='flex justify-end items-center -mb-3'>
         <div className='flex items-center mr-24 mt-4 bg-white rounded-md shadow-md'>
           <p className='p-2'>

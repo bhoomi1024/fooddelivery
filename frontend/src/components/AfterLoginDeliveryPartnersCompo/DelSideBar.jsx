@@ -17,6 +17,7 @@ const DelSidebar = () => {
     axios.get('http://localhost:3000/auth/DelLogout') // Corrected URL
       .then(res => {
         if (res.data.status) {
+          localStorage.removeItem('delId')
           navigate('/DelLogin');
         }
       })
@@ -27,10 +28,8 @@ const DelSidebar = () => {
   const sideMenu = [
     { title: 'Dashboard', icon: <SpaceDashboardIcon sx={{ fontSize: 30 }} />, path: 'DelDashboard' },
     { title: 'Orders', icon: <ShoppingBagIcon sx={{ fontSize: 30 }} />, path: 'DelOrderManagement' },
-    { title: 'Earnings', icon: <AttachMoneyIcon sx={{ fontSize: 30 }} />, path: 'DelEarnings' },
     { title: 'Notification', icon: <NotificationsIcon sx={{ fontSize: 30 }} />, path: 'DelNotifications' },
     { title: 'Profile', icon: <PersonIcon sx={{ fontSize: 30 }} />, path: 'DelProfile' },
-    { title: 'Setting', icon: <SettingsIcon sx={{ fontSize: 30 }} />, path: 'DelSettings' },
     { title: 'Support', icon: <SupportIcon sx={{ fontSize: 30 }} />, path: 'DelSupport' },
     { title: 'Logout', icon: <LogoutIcon sx={{ fontSize: 30 }} />,  onClick: handleLogout  },
   ];

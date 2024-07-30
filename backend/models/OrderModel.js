@@ -35,9 +35,14 @@ const OrderSchema = new Schema({
     orderItems: [
         {
             item: {
-                type: Schema.Types.ObjectId,
-                ref: "MenuItem",
-                required: true,
+                dishName: {
+                    type: String,
+                    required: true,
+                },
+                price: {
+                    type: Number,
+                    required: true,
+                },
             },
             quantity: {
                 type: Number,

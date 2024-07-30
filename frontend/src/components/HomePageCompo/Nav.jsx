@@ -22,9 +22,8 @@ const Nav = () => {
           </div>
           <ul className="hidden md:flex gap-x-7 justify-center items-center font-poppins text-[17px] font-medium tracking-[0.01em]">
            
-           {/* commented to modify delivery partner login page */}
-            {/* <Link to="/DeliveryPartnerLoginRegister"> */}
-            <Link to="/DelLayout">
+        
+            <Link to="/DeliveryPartnerLoginRegister">
               <li className="hover:cursor-pointer hover:scale-[0.975]">
                 Delivery partner
               </li>

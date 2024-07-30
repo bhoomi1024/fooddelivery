@@ -14,6 +14,7 @@ const RestaurantSidebar = () => {
     axios.get('http://localhost:3000/auth/logout') // Corrected URL
       .then(res => {
         if (res.data.status) {
+          localStorage.removeItem('restautantId');
           navigate('/ResLogin');
         }
       })

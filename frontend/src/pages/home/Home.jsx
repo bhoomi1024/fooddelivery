@@ -19,7 +19,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="hidden w-full h-[550px] md:grid lg:grid-cols-2 bg-yellow-300 mt-20">
+      <div className="hidden w-full h-[550px] md:grid lg:grid-cols-2 mt-20 bg-yellow-300">
         <div className="h-full flex flex-col items-center ">
           <h1 className="mt-24 ml-7 text-7xl  gap-y-6 flex flex-col font-display font-extrabold">
             <span>One stop</span>
@@ -38,7 +38,7 @@ const Home = () => {
         </div>
         <div className="h-full">
           <img
-            className="ml-20 mt-9 h-[460px] w-[485px] rounded-full shadow-lg"
+            className="ml-20 mt-9 h-[440px] w-[465px] rounded-full shadow-lg transition-transform duration-300 hover:scale-105"
             src={logo}
             alt="food delivery"
           />
@@ -50,7 +50,7 @@ const Home = () => {
      
       <div className="bg-white py-16" data-aos="fade-up">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-display font-bold text-center mb-12 text-yellow-600">Why Choose Us?</h2>
+          <h2 className="text-4xl font-display font-bold text-center mb-12">Why Choose Us?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { title: "Quality Assurance", description: "We prioritize freshness and taste in every meal.", icon: <FaBowlFood size={30} className="text-yellow-600" /> },
@@ -70,7 +70,7 @@ const Home = () => {
       </div>
 
       <h1 className="ml-36 mt-10 font-extrabold text-4xl font-display" data-aos="fade-right">
-        restaurants for you
+        Restaurants for you
       </h1>
       <div className="hidden md:grid grid-cols-4 mx-16 my-6 pl-20 pt-6 pb-10 gap-y-12">
         {data.map((food, index) => (

@@ -34,11 +34,9 @@ import DelLayout from "./pages/Delivery/DelLayout.jsx";
 
 
 import DelDashboard from "./components/AfterLoginDeliveryPartnersCompo/DelDashboard.jsx";
-import DelEarnings from "./components/AfterLoginDeliveryPartnersCompo/DelEarnings.jsx";
 import DelNotifications from "./components/AfterLoginDeliveryPartnersCompo/DelNotifications.jsx";
 import DelOrderManagement from "./components/AfterLoginDeliveryPartnersCompo/DelOrderManagement.jsx";
 import DelProfile from "./components/AfterLoginDeliveryPartnersCompo/DelProfile.jsx";
-import DelSettings from "./components/AfterLoginDeliveryPartnersCompo/DelSettings.jsx";
 import DelSupport from "./components/AfterLoginDeliveryPartnersCompo/DelSupport.jsx";
 
 
@@ -80,10 +78,8 @@ const router = createBrowserRouter(
       <Route path="/DelLayout" element={<DelLayout />}>
         <Route path="DelDashboard" element={<DelDashboard />} />
         <Route path="DelOrderManagement" element={<DelOrderManagement />} />
-        <Route path="DelEarnings" element={<DelEarnings />} />
         <Route path="DelNotifications" element={<DelNotifications />} />
         <Route path="DelProfile" element={<DelProfile />} />
-        <Route path="DelSettings" element={<DelSettings />} />
         <Route path="DelSupport" element={<DelSupport />} />
       </Route>
 

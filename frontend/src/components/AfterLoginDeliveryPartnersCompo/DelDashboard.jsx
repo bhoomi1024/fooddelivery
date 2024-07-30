@@ -2,12 +2,231 @@ import React, { useEffect, useState } from 'react';
 import { Grid, Card, CardContent, Typography } from '@mui/material';
 import UserImage from '../../assets/graph.jpeg'; // Ensure the path is correct
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+
+import { RxCross2 } from "react-icons/rx";
+
+const CurrentOrder = ({ orders, getOrders }) => {
+  const currentOrders = orders.filter((order) => order.orderStatus !== 'Delivered');
+
+  const [status, setStatus] = useState('');
+  const delId = localStorage.getItem('delId');
+  //Update order status
+  const updateOrderStatus = async (orderId) => {
+    try {
+      const res = await axios.put(`http://localhost:3000/api/order/updateOrderStatus/${orderId}`,
+        {
+          orderStatus: 'Delivered'
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log('status updated', res.data);
+      getOrders(delId);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+ 
+
+  return (
+    <>
+      {
+        currentOrders?.map((order) => (
+          <>
+
+            <div className='flex flex-col bg-white shadow-md rounded-md font-poppins mx-8 my-6 pt-4'>
+
+              <div className=' flex justify-center items-center font-semibold text-lg'>
+                ID : {order?.paymentId?.orderId}
+                {/* //Change this to payment order id */}
+              </div>
+
+              <div className='flex justify-between px-4 '>
+
+                {/* //Customer details */}
+                <div className='flex flex-col m-4 p-2 gap-y-3'>
+                  <div>
+                    Customer's Name : {order?.user?.ownerName}
+                  </div>
+                  <div>
+                    Customer's Phone : {order?.user?.phone}
+                  </div>
+                  <div className=' flex  items-center'>
+                    <p>Customer's Address : </p>
+                    {<p className=" p-3 text-wrap ">
+                      {order?.deliveryAddress?.address}, {order?.deliveryAddress?.city}, {order?.deliveryAddress?.state},{order?.deliveryAddress?.country}
+                    </p>}
+                  </div>
+                </div>
+
+                {/* //Restaurant details */}
+                <div className='flex flex-col m-4 p-2 gap-y-3'>
+                  <div>
+                    Restaurant's Name : {order?.restaurant?.restaurantName}
+                  </div>
+                  <div>
+                    Restaurant's Phone : {order?.restaurant?.phone}
+                  </div>
+                  <div className=' flex  items-center'>
+                    <p>Restaurant's Address : </p>
+                    {<p className=" p-3 text-wrap ">
+                      {order?.restaurant?.address}, {order?.restaurant?.city}, {order?.restaurant?.stateName},{order?.restaurant?.countryName}
+                    </p>}
+                  </div>
+                </div>
+
+                {/* //Order details */}
+                <div className='flex flex-col justify-between  m-4 p-2 '>
+                  {
+                    order?.orderItems?.map((item) => (
+                      <>
+                        <div className='flex justify-between w-60 px-2'>
+                          <span className='flex gap-x-1 items-center '>
+                            {item?.quantity}
+                            <RxCross2 size={14} />
+                            {item?.item?.dishName}
+                          </span>
+
+                        </div>
+                      </>
+                    ))
+                  }
+
+                  <div>
+                    <button className='bg-green-500 text-white rounded-md p-2 mb-2' onClick={() => updateOrderStatus(order._id)}>Mark As Delivered</button>
+                  </div>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+          </>
+        )
+        )
+      }
+    </>
+  )
+};
+
+const PastOrder = ({ orders }) => {
+  const pastOrders = orders.filter((order) => order.orderStatus === 'Delivered');
+  return (
+    <>
+      {
+        pastOrders?.map((order) => (
+          <>
+            <div className='flex flex-col bg-white shadow-md rounded-md font-poppins mx-8 my-6 pt-4'>
+
+              <div className=' flex justify-center items-center font-semibold text-lg'>
+                ID : {order?.paymentId?.orderId}
+                {/* //Change this to payment order id */}
+              </div>
+
+              <div className='flex justify-between px-4 '>
+
+                {/* //Customer details */}
+                <div className='flex flex-col m-4 p-2 gap-y-3'>
+                  <div>
+                    Customer's Name : {order?.user?.ownerName}
+                  </div>
+                  <div>
+                    Customer's Phone : {order?.user?.phone}
+                  </div>
+                  <div className=' flex  items-center'>
+                    <p>Customer's Address : </p>
+                    {<p className=" p-3 text-wrap ">
+                      {order?.deliveryAddress?.address}, {order?.deliveryAddress?.city}, {order?.deliveryAddress?.state},{order?.deliveryAddress?.country}
+                    </p>}
+                  </div>
+                </div>
+
+                {/* //Restaurant details */}
+                <div className='flex flex-col m-4 p-2 gap-y-3'>
+                  <div>
+                    Restaurant's Name : {order?.restaurant?.restaurantName}
+                  </div>
+                  <div>
+                    Restaurant's Phone : {order?.restaurant?.phone}
+                  </div>
+                  <div className=' flex  items-center'>
+                    <p>Restaurant's Address : </p>
+                    {<p className=" p-3 text-wrap ">
+                      {order?.restaurant?.address}, {order?.restaurant?.city}, {order?.restaurant?.stateName},{order?.restaurant?.countryName}
+                    </p>}
+                  </div>
+                </div>
+
+                {/* //Order details */}
+                <div className='flex flex-col justify-between  m-4 p-2 '>
+                  {
+                    order?.orderItems?.map((item) => (
+                      <>
+                        <div className='flex justify-between w-60 px-2'>
+                          <span className='flex gap-x-1 items-center '>
+                            {item?.quantity}
+                            <RxCross2 size={14} />
+                            {item?.item?.dishName}
+                          </span>
+
+                        </div>
+                      </>
+                    ))
+                  }
+
+                 
+
+                </div>
+
+
+              </div>
+
+            </div>
+          </>
+        ))
+      }
+    </>
+  )
+}
+
+
 
 const DelDashboard = () => {
   const navigate = useNavigate();
   const [delUser, setDelUser] = useState(null);
+  const [orders, setOrders] = useState([]);
 
+  const [isCurrentOrder, setIsCurrentOrder] = useState(true);
+
+  
+
+  
+  //Get all orders of a deliveryman
+
+  const getOrders = async (delId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/order/getOrdersByDelId/${delId}`, {
+        withCredentials: true,
+      });
+      console.log(delId);
+      console.log(response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  
+ 
   const callDelDashboard = async () => {
+
     try {
       const res = await fetch('http://localhost:3000/auth/DelLayout/DelDashboard', { // Update with the correct backend URL and port
         method: "GET",
@@ -17,25 +236,17 @@ const DelDashboard = () => {
         },
         credentials: "include"
       });
-  
+
       if (res.status !== 200) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-  
-      const textData = await res.text(); // Get response as text
-      console.log("Response text:", textData);
-  
-      if (!textData) {
+
+      const data = await res.json();
+      localStorage.setItem('delId', data._id);
+      getOrders(data._id);
+      setDelUser(data);
+      if (!data) {
         throw new Error("No data received");
-      }
-  
-      try {
-        const data = JSON.parse(textData); // Manually parse JSON
-        console.log(data);
-        setDelUser(data);
-      } catch (jsonError) {
-        console.error("Failed to parse JSON:", jsonError);
-        navigate('/DelLogin');
       }
     } catch (err) {
       console.log(err);
@@ -45,87 +256,30 @@ const DelDashboard = () => {
 
   useEffect(() => {
     callDelDashboard();
+    
   }, []);
 
+
+
+
   return (
-    <div className="bg-gradient-to-r from-white via-yellow-100 to-white ml-60 mt-[78px] w-full font-poppins p-4 h-screen flex">
+    <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins'>
       <div>
-        <h2 className='flex justify-center text-2xl my-4 font-semibold'>
-          {delUser && delUser.ownerName}
-        </h2>
-
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} sm={6} md={6}>
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow h-32 flex items-center justify-center mb-4 border border-yellow-300">
-              <CardContent className="text-center">
-                <Typography variant="h6" className="text-yellow-600 font-bold">
-                  Pending Orders
-                </Typography>
-                <ul className="list-disc pl-5 text-gray-800">
-                  <li>Order #001</li>
-                  <li>Order #002</li>
-                  <li>Order #003</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={6}>
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow h-32 flex items-center justify-center mb-4 border border-yellow-300">
-              <CardContent className="text-center">
-                <Typography variant="h6" className="text-yellow-600 font-bold">
-                  Completed Orders
-                </Typography>
-                <ul className="list-disc pl-5 text-gray-800">
-                  <li>Order #101</li>
-                  <li>Order #102</li>
-                  <li>Order #103</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={6}>
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow h-32 flex items-center justify-center mb-4 border border-yellow-300">
-              <CardContent className="text-center">
-                <Typography variant="h6" className="text-yellow-600 font-bold">
-                  Earnings
-                </Typography>
-                <Typography variant="body1" className="text-gray-800">
-                  Daily: <strong>$200</strong>
-                </Typography>
-                <Typography variant="body1" className="text-gray-800">
-                  Weekly: <strong>$1400</strong>
-                </Typography>
-                <Typography variant="body1" className="text-gray-800">
-                  Monthly: <strong>$6000</strong>
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={6}>
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow h-32 flex items-center justify-center mb-4 border border-yellow-300">
-              <CardContent className="text-center">
-                <Typography variant="h6" className="text-yellow-600 font-bold">
-                  Performance Metrics
-                </Typography>
-                <Typography variant="body1" className="text-gray-800">
-                  Average Delivery Time: <strong>30 mins</strong>
-                </Typography>
-                <Typography variant="body1" className="text-gray-800">
-                  Ratings: <strong>4.5/5</strong>
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+        <ul className='flex gap-x-6 p-5 text-neutral-500 ml-10'>
+          <button className={`${isCurrentOrder ? "text-green-500" : ""} flex p-1 bg-white rounded-md w-36 justify-center shadow-md`}
+            onClick={() => setIsCurrentOrder(true)}>
+            Current orders
+          </button>
+          <button className={`${!isCurrentOrder ? "text-red-500" : ""} flex p-1 bg-white rounded-md w-32 justify-center shadow-md`}
+            onClick={() => setIsCurrentOrder(false)}>
+            Past orders
+          </button>
+        </ul>
       </div>
 
-      {/* Image on the side with increased top distance */}
-      <div className="w-1/3 flex items-start justify-center mt-12">
-        <img src={UserImage} alt="User" className="w-64 h-48 object-cover rounded-none" />
-      </div>
+      {
+        isCurrentOrder ? <CurrentOrder orders= {orders} getOrders={getOrders} /> : <PastOrder orders={orders} />
+      }
     </div>
   );
 };

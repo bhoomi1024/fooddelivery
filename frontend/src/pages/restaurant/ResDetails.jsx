@@ -77,7 +77,7 @@ const Details = ({ restaurantId }) => {
     };
 
     return (
-        <div className='bg-gray-100 ml-60 mt-[78px] w-full font-display'>
+        <div className='bg-gray-100 ml-60 mt-[78px] w-full font-display min-h-screen'>
             <form className='my-8 mx-32 flex flex-col bg-white gap-y-4 pb-8 shadow-md' onSubmit={handleSubmit}>
                 <div className='flex '>
                     <div className='w-full'>

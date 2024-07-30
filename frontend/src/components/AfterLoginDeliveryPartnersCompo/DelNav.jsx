@@ -19,12 +19,12 @@ const DelNav= () => {
                     </h1>
                 </div>              
 
-                <div className=' font-poppins'>
+                {/* <div className=' font-poppins'>
                     <select className={` shadow-md border-none rounded-md h-8 w-28 font-medium ${status=="Open"?"text-green-600 outline-none":"text-red-600 outline-none"} `} value={status} onChange ={handleChange}>
                     <option className='text-black' value="Open" >Open</option>
                     <option className='text-black' value="Closed" >Closed</option>
                     </select>
-                </div>
+                </div> */}
             </nav>
         </div>
     );

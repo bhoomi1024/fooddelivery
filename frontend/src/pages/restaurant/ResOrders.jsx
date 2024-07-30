@@ -36,7 +36,7 @@ const CurrentOrder = ({ currentOrders, getOrders }) => {
             {
                 currentOrders?.map((order) => (
                     <>
-                        <div className='flex justify-between mx-20 my-6 bg-white shadow-md rounded-md font-poppins'>
+                        <div className='flex justify-between mx-20 my-6 bg-white shadow-md rounded-md font-poppins '>
                             <div className='flex flex-col m-4 p-2 gap-y-3'>
                                 <div className='font-semibold text-lg'>
                                     ID : {order?.paymentId?.orderId}
@@ -86,7 +86,7 @@ const CurrentOrder = ({ currentOrders, getOrders }) => {
                                 </select>
                                 <p className='mt-4 text-neutral-500 text-sm'>
                                     
-                                    {CurrentOrder.deliveryman?`${CurrentOrder?.deliveryman?.ownerName} assigned `:'No deliveryman assigned yet'}
+                                    {order.deliveryman?`${order?.deliveryman?.ownerName} assigned `:'No deliveryman assigned yet'}
                                 </p>
                             </div>
 
@@ -187,7 +187,7 @@ const ResOrders = () => {
 
 
     return (
-        <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins'>
+        <div className='bg-gray-100 ml-60 mt-[78px] w-full font-poppins min-h-screen'>
             <div>
                 <ul className='flex gap-x-6 p-5 text-neutral-500 ml-10'>
                     <button className={`${isCurrentOrder ? "text-green-500" : ""} flex p-1 bg-white rounded-md w-36 justify-center shadow-md`}

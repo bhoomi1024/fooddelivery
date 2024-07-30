@@ -160,7 +160,9 @@ const UsersCart = () => {
           console.log("razorpay res ", apiResponse);
           if (apiResponse.success) {
             const orderData = {
-              orderItems: cartItems.map((item) => ({ item: item._id, quantity: item.quantity })), // map cart items to order items
+              orderItems: cartItems.map((item) => (
+                { item: {dishName:item.dishName,price:item.price}, 
+                quantity: item.quantity })),
               totalAmount: orderAmount,
               paymentId: apiResponse.orderConfirm._id,
               deliveryAddress: selectedAddress,
