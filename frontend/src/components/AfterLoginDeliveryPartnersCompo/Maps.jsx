@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import placeholder from '../../assets/red.png'; // Update path if needed
 
+import placeholder from '../../assets/bluee.png';
 const icon = L.icon({
   iconUrl: placeholder,
-  iconSize: [38, 38],
+  iconSize: [50, 50],
 });
+
 
 const position = [20.5937, 78.9629]; // Default center position
 

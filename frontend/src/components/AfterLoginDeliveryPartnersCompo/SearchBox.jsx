@@ -6,7 +6,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-
+import placeholder from '../../assets/red.png';
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 
 const SearchBox = ({ label, setSelectPosition }) => {
@@ -83,7 +83,7 @@ const SearchBox = ({ label, setSelectPosition }) => {
                 >
                   <ListItemIcon>
                     <img
-                      src="./placeholder.png"
+                      src= {placeholder}
                       alt="Placeholder"
                       style={{ width: 38, height: 38 }}
                     />
