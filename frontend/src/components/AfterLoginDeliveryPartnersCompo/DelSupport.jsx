@@ -5,11 +5,11 @@ import BackgroundImage from '../../assets/profile.jpg'; // Ensure the path is co
 const faqs = [
   {
     question: "What is the delivery process?",
-    answer: "The delivery process involves several steps: order placement, preparation, dispatch, and delivery."
+    answer: "The delivery process includes the following steps: After you place an order, you choose a restaurant, and the request is sent to a delivery partner. The delivery partner receives the request and can either accept or decline it. Once accepted, the order appears in their 'Current Orders' section, where they can view the order ID and delivery address. The address can be manually copied, and the delivery partner can use the map in the 'Notification' section to search for the user's location and plan the route."
   },
   {
-    question: "How can I track my order?",
-    answer: "You can track your order through the tracking link sent to your email."
+    question: "How do I reset my password?",
+    answer: "To reset your password, go to the login page, click on Forgot Password, and enter your registered email address. You will receive an email with a link to reset your password. Follow the instructions in the email to set a new password."
   },
   {
     question: "What should I do if my order is delayed?",
@@ -51,9 +51,6 @@ const DelSupport = () => {
           <div className="text-left">
             <Typography variant="h6" className="text-yellow-600 font-bold mb-2">
               Contact Support
-            </Typography>
-            <Typography variant="body1" className="text-gray-800">
-              Live Chat: <strong>Available</strong>
             </Typography>
             <Typography variant="body1" className="text-gray-800">
               Email Support: <strong>support@example.com</strong>
