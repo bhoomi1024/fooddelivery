@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, LogOut, Heart, UserRound, ShoppingCart } from 'lucide-react';
+import { ShoppingBag, LogOut, UserRound, ShoppingCart, ChevronDown } from 'lucide-react';
 import { SiGreasyfork } from 'react-icons/si';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 
 const Navbar = ({ likedCount }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
   const [User, setUser] = useState([]);
   const userId = localStorage.getItem('userId');
   const navigate = useNavigate();
-  const cartCount = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId == userId).reduce((total,item) => total + item.quantity,0));
-
+  const cartCount = useSelector(state => state.cart.cartItems.filter(cartItem => cartItem.userId === userId).reduce((total, item) => total + item.quantity, 0));
 
   const callUserDashboard = async () => {
     try {
@@ -23,22 +21,22 @@ const Navbar = ({ likedCount }) => {
         },
         credentials: "include"
       });
-  
+
       if (res.status !== 200) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
-  
+
       const textData = await res.text(); // Get response as text
       console.log("Response text:", textData);
-  
+
       if (!textData) {
         throw new Error("No data received");
       }
-  
+
       try {
         const data = JSON.parse(textData); // Manually parse JSON
         console.log(data);
-        localStorage.setItem('userId',data._id);
+        localStorage.setItem('userId', data._id);
         console.log(data._id);
         setUser(data);
       } catch (jsonError) {
@@ -55,14 +53,8 @@ const Navbar = ({ likedCount }) => {
     callUserDashboard();
   }, []);
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
-
-  axios.defaults.withCredentials = true;
-
   const handleLogout = () => {
-    axios.get('http://localhost:3000/auth/UserLogout') // Corrected URL
+    axios.get('http://localhost:3000/auth/UserLogout')
       .then(res => {
         if (res.data.status) {
           localStorage.removeItem("userId");
@@ -104,13 +96,13 @@ const Navbar = ({ likedCount }) => {
                 <button className="ml-3 p-1 relative">
                   <ShoppingCart className="h-6 w-6" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-3 -right-2 bg-red-400 text-white rounded-full px-2  text-sm font-bold">
+                    <span className="absolute -top-3 -right-2 bg-red-400 text-white rounded-full px-2 text-sm font-bold">
                       {cartCount}
                     </span>
                   )}
                 </button>
               </Link>
-              <Link to="/Usersliked">
+              {/* <Link to="/Usersliked">
                 <button className="ml-3 p-1 relative">
                   <Heart className="h-6 w-6" />
                   {likedCount > 0 && (
@@ -119,25 +111,24 @@ const Navbar = ({ likedCount }) => {
                     </span>
                   )}
                 </button>
-              </Link>
-              <div className="relative">
-                <button onClick={toggleDropdown} className="ml-3 p-1">
+              </Link> */}
+              <div className="relative group flex items-center">
+                <button className="ml-3 p-1 flex items-center">
                   <UserRound className="h-6 w-6" />
+                  <ChevronDown className="h-4 w-4 ml-1" />
                 </button>
-                <span className="inline-block h-6 w-6 ml-2">{User.ownerName}</span>
-                {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                    <Link to="/UsersOrders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      <ShoppingBag className="mr-2" />My orders
-                    </Link>
-                    <button 
-                      onClick={handleLogout} 
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                    >
-                      <LogOut className="mr-2" />Log out
-                    </button>
-                  </div>
-                )}
+                <span className="inline-block ml-4 text-gray-700 font-semibold text-lg bg-white p-2 rounded shadow">{User.ownerName}</span>
+                <div className="absolute left-0 mt-32 w-48 bg-white rounded-md shadow-lg py-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <Link to="/UsersOrders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <ShoppingBag className="mr-2" />My orders
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                  >
+                    <LogOut className="mr-2" />Log out
+                  </button>
+                </div>
               </div>
             </div>
           </div>
