@@ -149,10 +149,10 @@ const UsersRestaurant = () => {
 
       <div className="flex justify-start gap-2 my-5 px-5">
         <Rating4PlusButton isSelected={rating4PlusSelected} onClick={() => handleFilterChange('rating', 4)} />
-        <button className="flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300" onClick={toggleFilters}>
+        {/* <button className="flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-full cursor-pointer font-medium text-sm text-gray-800 transition-colors duration-300 hover:bg-gray-300" onClick={toggleFilters}>
           <span className="mr-2"><SlidersHorizontal /></span>
           Filters
-        </button>
+        </button> */}
         <SearchRestaurant searchTerm={searchTerm} handleSearch={handleSearch} />
       </div>
 

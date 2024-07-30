@@ -12,6 +12,7 @@ const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 const SearchBox = ({ label, setSelectPosition }) => {
   const [searchText, setSearchText] = useState("");
   const [listPlace, setListPlace] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleSearch = () => {
     const params = {
@@ -23,56 +24,78 @@ const SearchBox = ({ label, setSelectPosition }) => {
     const queryString = new URLSearchParams(params).toString();
     fetch(`${NOMINATIM_BASE_URL}${queryString}`)
       .then((response) => response.json())
-      .then((result) => setListPlace(result))
+      .then((result) => {
+        setListPlace(result);
+        setIsDropdownOpen(result.length > 0); // Show dropdown only if there are results
+      })
       .catch((err) => console.error("Error:", err));
   };
 
+  const handleItemClick = (item) => {
+    setSearchText(item.display_name); // Update the input field with the selected address
+    setSelectPosition({
+      lat: item.lat,
+      lon: item.lon,
+      display_name: item.display_name
+    });
+    setIsDropdownOpen(false); // Close dropdown on item click
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex" }}>
-        <div style={{ flex: 1 }}>
-          <OutlinedInput
-            style={{ width: "100%" }}
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-          />
-        </div>
-        <div style={{ display: "flex", alignItems: "center", padding: "0px 20px" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSearch}
-          >
-            Search
-          </Button>
-        </div>
+    <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: "20px" }}>
+        <OutlinedInput
+          style={{ width: "100%", marginBottom: "10px" }}
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+          onFocus={() => setIsDropdownOpen(listPlace.length > 0)} // Open dropdown on focus if there are results
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSearch}
+          style={{ width: "150px", height: "36px" }}
+        >
+          Search
+        </Button>
       </div>
-      <div>
-        <List component="nav" aria-label="main mailbox folders">
-          {listPlace.map((item) => (
-            <div key={item?.place_id}>
-              <ListItem
-                button
-                onClick={() => setSelectPosition({
-                  lat: item.lat,
-                  lon: item.lon,
-                  display_name: item.display_name
-                })}
-              >
-                <ListItemIcon>
-                  <img
-                    src="./placeholder.png"
-                    alt="Placeholder"
-                    style={{ width: 38, height: 38 }}
-                  />
-                </ListItemIcon>
-                <ListItemText primary={item?.display_name} />
-              </ListItem>
-              <Divider />
-            </div>
-          ))}
-        </List>
-      </div>
+      {isDropdownOpen && (
+        <div
+          style={{
+            maxHeight: "200px",
+            overflowY: "auto",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            position: "absolute",
+            backgroundColor: "#fff",
+            zIndex: 1,
+            width: "100%", // Ensure the dropdown matches the width of the input field
+            top: "100%", // Position the dropdown directly below the input field
+            left: 0,
+          }}
+        >
+          <List component="nav" aria-label="main mailbox folders">
+            {listPlace.map((item) => (
+              <div key={item?.place_id}>
+                <ListItem
+                  button
+                  onClick={() => handleItemClick(item)}
+                >
+                  <ListItemIcon>
+                    <img
+                      src="./placeholder.png"
+                      alt="Placeholder"
+                      style={{ width: 38, height: 38 }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary={item?.display_name} />
+                </ListItem>
+                <Divider />
+              </div>
+            ))}
+          </List>
+        </div>
+      )}
     </div>
   );
 };
